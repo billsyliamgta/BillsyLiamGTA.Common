@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,10 +46,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ped\SyncScene.cs" />
-    <Compile Include="Scaleforms\Celebration.cs" />
-    <Compile Include="Scaleforms\Scaleform.cs" />
+    <Compile Include="Audio\AudioScene.cs" />
+    <Compile Include="Elements\Tools.cs" />
+    <Compile Include="Minigames\Artwork.cs" />
+    <Compile Include="Minigames\BaseMinigame.cs" />
+    <Compile Include="Minigames\Fingerprint\FingerprintMinigame.cs" />
+    <Compile Include="Minigames\Fingerprint\FingerprintScanner.cs" />
+    <Compile Include="Minigames\Lockbox.cs" />
+    <Compile Include="Minigames\MinigameValueAddedArgs.cs" />
+    <Compile Include="Minigames\MinigameValueAddedEventHandler.cs" />
+    <Compile Include="Ped\Enemy.cs" />
+    <Compile Include="Ped\EnemyHandler.cs" />
+    <Compile Include="Ped\SynchronizedScene.cs" />
+    <Compile Include="Graphics\Scaleform\Celebration\CelebrationTextureIds.cs" />
+    <Compile Include="Graphics\Scaleform\Celebration\IntroCelebration.cs" />
+    <Compile Include="Graphics\Scaleform\Scaleform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Minigames\TrollyGrab.cs" />
+    <Compile Include="Graphics\TimerBars\BaseTimerBar.cs" />
+    <Compile Include="Graphics\TimerBars\CountdownTimerBar.cs" />
+    <Compile Include="Graphics\TimerBars\ProgressTimerBar.cs" />
+    <Compile Include="Graphics\TimerBars\TakeTimerBar.cs" />
+    <Compile Include="Graphics\TimerBars\TextTimerBar.cs" />
+    <Compile Include="Graphics\TimerBars\TimerBarHelpers.cs" />
+    <Compile Include="Graphics\TimerBars\TimerBarPool.cs" />
+    <Compile Include="Elements\VariableTimer.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

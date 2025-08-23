@@ -1,0 +1,4 @@
+﻿namespace BillsyLiamGTA.Common.Minigames
+{
+    public delegate void MinigameValueAddedEventHandler(object sender, MinigameValueAddedArgs e);
+}
