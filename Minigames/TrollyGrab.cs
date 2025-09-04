@@ -3,24 +3,13 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.Ped;
+using BillsyLiamGTA.Common.Audio;
+using GTA.UI;
 
 namespace BillsyLiamGTA.Common.Minigames
 {
     public class TrollyGrab : BaseMinigame
     {
-        #region Enum
-
-        public enum TrollyVariants
-        {
-            Invalid = -1,
-            Cash,
-            Coke,
-            Gold,
-            Diamond
-        }
-
-        #endregion
-
         #region Properties
 
         private Prop Cart;
@@ -29,7 +18,16 @@ namespace BillsyLiamGTA.Common.Minigames
 
         private bool EnableCasinoBlackjackCamera = false;
 
-        public TrollyVariants Variant { get; set; }
+        public enum Variants
+        {
+            Invalid = -1,
+            Cash,
+            Coke,
+            Gold,
+            Diamond
+        }
+
+        public Variants Variant { get; set; }
 
         private Prop Bag;
 
@@ -41,27 +39,27 @@ namespace BillsyLiamGTA.Common.Minigames
 
         #region Constructor
 
-        public TrollyGrab(Prop cart, TrollyVariants variant)
+        public TrollyGrab(Prop cart, Variants variant)
         {
             Cart = cart;
             Variant = variant;
-            if (variant == TrollyVariants.Invalid) throw new ArgumentException("ERROR: Trolly Grab object created with the hand variant 'Invalid'.");
-            MaxRate = variant == TrollyVariants.Gold ? 1.2f : 1.5f;
+            if (variant == Variants.Invalid) throw new ArgumentException("ERROR: TrollyGrab object created with the variant type 'Invalid'.");
+            MaxRate = variant == Variants.Gold ? 1.2f : 1.5f;
         }
 
         #endregion
 
         #region Functions
 
-        public void GiveBlip(BlipSprite sprite, BlipColor color, string name, float scale = 1f, bool shortRange = true)
+        public void GiveBlip(BlipSprite sprite, BlipColor colour, string name, float scale = 1f, bool isShortRange = true)
         {
             if (Cart != null && Cart.Exists())
             {
                 Blip blip = Cart.AddBlip();
                 blip.Sprite = sprite;
                 blip.Scale = scale;
-                blip.Color = color;
-                blip.IsShortRange = shortRange;
+                blip.Color = colour;
+                blip.IsShortRange = isShortRange;
                 blip.Name = name;
             }
         }
@@ -75,8 +73,11 @@ namespace BillsyLiamGTA.Common.Minigames
         private void PlayExitSequence()
         {
             EnableCasinoBlackjackCamera = false;
-            Hand?.Delete();
-            Hand = null;
+            if (Hand != null && Hand.Exists())
+            {
+                Hand.Delete();
+                Hand = null;
+            }
             PlayerScene = new SynchronizedScene(Cart.Position, Cart.Rotation);
             PlayerScene.Generate();
             PlayerScene.PlayPed(Game.Player.Character, "anim@heists@ornate_bank@grab_cash", "exit", 1.5f, -8.0f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
@@ -95,19 +96,19 @@ namespace BillsyLiamGTA.Common.Minigames
                     {
                         switch (Variant)
                         {
-                            case TrollyVariants.Cash:
+                            case Variants.Cash:
                                 {
                                     return "MC_GRAB_1"; /* GXT: Press ~INPUT_CONTEXT~ to begin grabbing the cash. */
                                 }
-                            case TrollyVariants.Coke:
+                            case Variants.Coke:
                                 {
                                     return "MC_GRAB_6"; /* GXT: Press ~INPUT_CONTEXT~ to begin grabbing the drugs. */
                                 }
-                            case TrollyVariants.Gold:
+                            case Variants.Gold:
                                 {
                                     return "MC_GRAB_2"; /* GXT: Press ~INPUT_CONTEXT~ to begin grabbing the gold. */
                                 }
-                            case TrollyVariants.Diamond:
+                            case Variants.Diamond:
                                 {
                                     return "MC_GRAB_7"; /* GXT: Press ~INPUT_CONTEXT~ to begin grabbing the diamonds. */
                                 }
@@ -118,19 +119,19 @@ namespace BillsyLiamGTA.Common.Minigames
                     {
                         switch (Variant)
                         {
-                            case TrollyVariants.Cash:
+                            case Variants.Cash:
                                 {
                                     return "MC_GRAB_3_MK"; /* GXT: Repeatedly tap ~INPUT_CURSOR_ACCEPT~ to quickly grab the cash. Press ~INPUT_CURSOR_CANCEL~ to stop grabbing the cash. */
                                 }
-                            case TrollyVariants.Coke:
+                            case Variants.Coke:
                                 {
                                     return "MC_GRAB_5_MK"; /* GXT: Repeatedly tap ~INPUT_CURSOR_ACCEPT~ to quickly grab the drugs. Press ~INPUT_CURSOR_CANCEL~ to stop grabbing the drugs. */
                                 }
-                            case TrollyVariants.Gold:
+                            case Variants.Gold:
                                 {
                                     return "MC_GRAB_4B"; /* GXT: Repeatedly tap ~INPUT_CURSOR_ACCEPT~ to quickly grab the gold. Press ~INPUT_CURSOR_CANCEL~ to stop grabbing the gold. */
                                 }
-                            case TrollyVariants.Diamond:
+                            case Variants.Diamond:
                                 {
                                     return "MC_GRAB_7_MK"; /* GXT: Repeatedly tap ~INPUT_CURSOR_ACCEPT~ to quickly grab the diamonds. Press ~INPUT_CURSOR_CANCEL~ to stop grabbing the diamonds. */
                                 }
@@ -141,19 +142,19 @@ namespace BillsyLiamGTA.Common.Minigames
                     {
                         switch (Variant)
                         {
-                            case TrollyVariants.Cash:
+                            case Variants.Cash:
                                 {
                                     return "MC_GRAB_3"; /* GXT: Repeatedly tap ~INPUT_FRONTEND_ACCEPT~ to quickly grab the cash. Press ~INPUT_FRONTEND_CANCEL~ to stop grabbing the cash. */
                                 }
-                            case TrollyVariants.Coke:
+                            case Variants.Coke:
                                 {
                                     return "MC_GRAB_5"; /* GXT: Repeatedly tap ~INPUT_FRONTEND_ACCEPT~ to quickly grab the drugs. Press ~INPUT_FRONTEND_CANCEL~ to stop grabbing the drugs. */
                                 }
-                            case TrollyVariants.Gold:
+                            case Variants.Gold:
                                 {
                                     return "MC_GRAB_4"; /* GXT: Repeatedly tap ~INPUT_FRONTEND_ACCEPT~ to quickly grab the gold. Press ~INPUT_FRONTEND_CANCEL~ to stop grabbing the gold. */
                                 }
-                            case TrollyVariants.Diamond:
+                            case Variants.Diamond:
                                 {
                                     return "MC_GRAB_7_TP"; /* GXT: Repeatedly tap ~INPUT_FRONTEND_ACCEPT~ to quickly grab the diamonds. Press ~INPUT_FRONTEND_CANCEL~ to stop grabbing the diamonds. */
                                 }
@@ -169,19 +170,19 @@ namespace BillsyLiamGTA.Common.Minigames
         {
             switch (Variant)
             {
-                case TrollyVariants.Cash:
+                case Variants.Cash:
                     {
                         return "hei_prop_heist_cash_pile";
                     }
-                case TrollyVariants.Coke:
+                case Variants.Coke:
                     {
                         return "imp_prop_impexp_coke_pile";
                     }
-                case TrollyVariants.Gold:
+                case Variants.Gold:
                     {
                         return "ch_prop_gold_bar_01a";
                     }
-                case TrollyVariants.Diamond:
+                case Variants.Diamond:
                     {
                         return "ch_prop_vault_dimaondbox_01a";
                     }
@@ -210,10 +211,12 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, GetHelpTextGXTEntry(0), true);
                             if (Game.IsControlJustPressed(Control.Context))
                             {
+                                Screen.ClearHelpText();
                                 Game.Player.Character.CanSwitchWeapons = false;
                                 Game.Player.Character.Weapons.Select(WeaponHash.Unarmed);
+                                ScriptIsInProgress = true;
                                 Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, true);
-                                Function.Call(Hash.START_AUDIO_SCENE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+                                AudioScene.Start("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
                                 Hand = World.CreateProp(GetHandModel(), Game.Player.Character.Position, false, false);
                                 Hand.IsCollisionEnabled = false;
                                 Hand.IsVisible = false;
@@ -254,30 +257,27 @@ namespace BillsyLiamGTA.Common.Minigames
                             CartScene.PlayEntity(Cart, "anim@heists@ornate_bank@grab_cash", "cart_cash_dissapear", 1000f, -4f, SynchronizedScene.PlaybackFlags.USE_PHYSICS, 0);
                             Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Cart);
                             CartScene.Rate = 0f;
-                            CartScene.Phase = Local_29575.f_13;
+                            CartScene.Phase = Data.f_13;
                             Index++;
                         }
                     }
                     break;
                 case 3:
                     {
-                        if (PlayerScene.IsFinished)
-                        {
-                            Index++;
-                        }
+                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
                     }
                     break;
                 case 4:
                     {
                         if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, "anim@heists@ornate_bank@grab_cash", "grab", 3))
                         {
-                            PlayerScene.Rate = Local_29575.f_14;
-                            CartScene.Rate = Local_29575.f_14;
-                            Local_29575.f_13 = PlayerScene.Phase;
+                            PlayerScene.Rate = Data.f_14;
+                            CartScene.Rate = Data.f_14;
+                            Data.f_13 = PlayerScene.Phase;
 
                             if (Function.Call<bool>(Hash.HAS_ANIM_EVENT_FIRED, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "CASH_APPEAR")))
                             {
-                                Hand.IsVisible = true;
+                                if (Hand != null && Hand.Exists() && !Hand.IsVisible) Hand.IsVisible = true;
                             }
 
                             if (Function.Call<bool>(Hash.HAS_ANIM_EVENT_FIRED, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "RELEASE_CASH_DESTROY")))
@@ -285,19 +285,25 @@ namespace BillsyLiamGTA.Common.Minigames
                                 int min = 0, max = 0;
                                 switch (Variant)
                                 {
-                                    case TrollyVariants.Cash:
+                                    case Variants.Cash:
                                         {
                                             min = 2000;
                                             max = 3000;
                                         }
                                         break;
-                                    case TrollyVariants.Gold:
+                                    case Variants.Coke:
+                                        {
+                                            min = 4000;
+                                            max = 5000;
+                                        }
+                                        break;
+                                    case Variants.Gold:
                                         {
                                             min = 9000;
                                             max = 10000;
                                         }
                                         break;
-                                    case TrollyVariants.Diamond:
+                                    case Variants.Diamond:
                                         {
                                             min = 12000;
                                             max = 13000;
@@ -305,8 +311,8 @@ namespace BillsyLiamGTA.Common.Minigames
                                         break;
                                 }
                                 ValueAdded?.Invoke(this, new MinigameValueAddedArgs(Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, min, max), true));
-                                Hand.IsVisible = false;
-                                if (Local_29575.f_14 == 0.75f)
+                                if (Hand != null && Hand.Exists() && Hand.IsVisible) Hand.IsVisible = false;
+                                if (Data.f_14 == 0.75f)
                                 {
                                     PlayerScene = new SynchronizedScene(Cart.Position, Cart.Rotation);
                                     PlayerScene.Generate();
@@ -319,7 +325,7 @@ namespace BillsyLiamGTA.Common.Minigames
                                 }
                             }
 
-                            if (Local_29575.f_13 > 0.999f)
+                            if (Data.f_13 > 0.999f)
                             {
                                 RemoveBlip();
                                 IsLooted = true;
@@ -328,7 +334,7 @@ namespace BillsyLiamGTA.Common.Minigames
                         }
                         else if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, "anim@heists@ornate_bank@grab_cash", "grab_idle", 3))
                         {
-                            if (Local_29575.f_14 > 0.75f)
+                            if (Data.f_14 > 0.75f)
                             {
                                 PlayerScene = new SynchronizedScene(Cart.Position, Cart.Rotation);
                                 PlayerScene.Generate();
@@ -336,13 +342,10 @@ namespace BillsyLiamGTA.Common.Minigames
                                 Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
                                 PlayerScene.PlayEntity(Bag, "anim@heists@ornate_bank@grab_cash", "bag_grab", 2f, -8f);
                                 Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
-                                PlayerScene.Phase = Local_29575.f_13;
+                                PlayerScene.Phase = Data.f_13;
                             }
 
-                            if (Game.IsControlJustPressed(Function.Call<bool>(Hash.IS_USING_KEYBOARD_AND_MOUSE, 2 /*FRONTEND_CONTROL*/) ? Control.CursorCancel : Control.FrontendCancel))
-                            {
-                                PlayExitSequence();
-                            }
+                            if (Game.IsControlJustPressed(Function.Call<bool>(Hash.IS_USING_KEYBOARD_AND_MOUSE, 2 /*FRONTEND_CONTROL*/) ? Control.CursorCancel : Control.FrontendCancel)) PlayExitSequence();
                         }
                         else
                         {
@@ -358,7 +361,7 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 5:
                     {
-                        if (PlayerScene.IsFinished)
+                        if (PlayerScene != null && PlayerScene.IsFinished)
                         {
                             Bag?.Delete();
                             Bag = null;
@@ -367,8 +370,9 @@ namespace BillsyLiamGTA.Common.Minigames
                             CartScene?.Dispose();
                             CartScene = null;
                             Game.Player.Character.CanSwitchWeapons = true;
+                            ScriptIsInProgress = false;
                             Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
-                            Function.Call(Hash.STOP_AUDIO_SCENE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+                            AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
                             Function.Call(Hash.REMOVE_ANIM_DICT, "anim@heists@ornate_bank@grab_cash");
                             Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 45, 0, 0);
                             Game.Player.Character.Task.ClearAll();
@@ -379,48 +383,63 @@ namespace BillsyLiamGTA.Common.Minigames
             }
         }
 
-        public override void PushDeathResetFunc()
+        public override void PushDeathResetFunction()
         {
-            base.PushDeathResetFunc();
-            Hand?.Delete();
-            Hand = null;
+            base.PushDeathResetFunction();
+            if (Hand != null && Hand.Exists())
+            {
+                Hand.Delete();
+                Hand = null;
+            }
             EnableCasinoBlackjackCamera = false;
-            Bag?.Delete();
-            Bag = null;
+            if (Bag != null && Bag.Exists())
+            {
+                Bag.Delete();
+                Bag = null;
+            }
             PlayerScene?.Dispose();
             PlayerScene = null;
             CartScene?.Dispose();
             CartScene = null;
-            Game.Player.Character.CanSwitchWeapons = true;
-            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
-            if (Function.Call<bool>(Hash.IS_AUDIO_SCENE_ACTIVE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE")) Function.Call(Hash.STOP_AUDIO_SCENE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+            if (AudioScene.IsActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE")) AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
             Function.Call(Hash.REMOVE_ANIM_DICT, "anim@heists@ornate_bank@grab_cash");
             Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 45, 0, 0);
-            Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
-            Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 3);
+            if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 0)) Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
+            if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 3)) Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 3);
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            Cart?.AttachedBlip?.Delete();
-            Cart?.Delete();
-            Cart = null;
-            Hand?.Delete();
-            Hand = null;
+            if (Cart != null && Cart.Exists())
+            {
+                if (Cart.AttachedBlip != null && Cart.AttachedBlip.Exists())
+                {
+                    Cart.AttachedBlip.Delete();
+                }
+
+                Cart.Delete();
+                Cart = null;
+            }
+            if (Hand != null && Hand.Exists())
+            {
+                Hand.Delete();
+                Hand = null;
+            }
             EnableCasinoBlackjackCamera = false;
-            Bag?.Delete();
-            Bag = null;
+            if (Bag != null && Bag.Exists())
+            {
+                Bag.Delete();
+                Bag = null;
+            }
             PlayerScene?.Dispose();
             PlayerScene = null;
             CartScene?.Dispose();
             CartScene = null;
-            Game.Player.Character.CanSwitchWeapons = true;
-            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
-            if (Function.Call<bool>(Hash.IS_AUDIO_SCENE_ACTIVE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE")) Function.Call(Hash.STOP_AUDIO_SCENE, "DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+            if (AudioScene.IsActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE")) AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
             Function.Call(Hash.REMOVE_ANIM_DICT, "anim@heists@ornate_bank@grab_cash");
-            Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
-            Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 3);
+            if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 0)) Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
+            if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 3)) Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 3);
         }
 
         #endregion

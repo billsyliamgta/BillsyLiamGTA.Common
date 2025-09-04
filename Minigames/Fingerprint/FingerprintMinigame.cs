@@ -4,15 +4,17 @@ using System.Collections.Generic;
 using GTA;
 using GTA.Native;
 using static GTA.Game;
-using Scaleform = BillsyLiamGTA.Common.Graphics.Scaleform.Scaleform;
+using BaseScaleform = BillsyLiamGTA.Common.Scaleform.BaseScaleform;
 using BillsyLiamGTA.Common.Audio;
 using BillsyLiamGTA.Common.Graphics.TimerBars;
+using BillsyLiamGTA.Common.Scaleform;
+using GTA.UI;
 
 namespace BillsyLiamGTA.Common.Minigames.Fingerprint
 {
     public class FingerprintMinigame
     {
-        #region Enum
+        #region Properties
 
         public enum FingerprintMinigameState
         {
@@ -20,10 +22,6 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
             Failed,
             Successful
         }
-
-        #endregion
-
-        #region Properties
 
         public FingerprintMinigameState State { get; private set; }
 
@@ -178,7 +176,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
             { 4, new HashSet<int> { 0, 1, 2, 3 } }
         };
 
-        public Scaleform InstructionalButtons;
+        public InstructionalButtons InstructionalButtons;
 
         private bool HasDrawScreenSoundPlayed = false;
 
@@ -199,7 +197,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
 
         #endregion
 
-        #region Functions re-coded from Decomplied Scripts
+        #region Functions
 
         void func_14091(string sParam0, string sParam1, float fParam2, float fParam3, float fParam4, float fParam5, float fParam6, int iParam7, int iParam8, int iParam9, int iParam10, bool bParam11)//Position - 0x46C46F
         {
@@ -316,10 +314,6 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
             return fVar0;
         }
 
-        #endregion
-
-        #region Functions
-
         private void DisableControls(bool toggle)
         {
             if (toggle)
@@ -378,6 +372,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
 
         private void Controls()
         {
+            bool canRunCheck = SelectedPrints?.Count == 4;
             if (!IsProcessing && !IsScrambling)
             {
                 if (IsControlJustPressed(Control.FrontendRight) && Selection < 7)
@@ -407,7 +402,6 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                 if (IsControlJustPressed(Control.FrontendAccept))
                 {
                     bool contains = SelectedPrints.Contains(Selection);
-
                     if (SelectedPrints.Count != 4)
                     {
                         if (!contains)
@@ -422,11 +416,9 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                         Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "Deselect_Print_Tile", "DLC_H3_Cas_Finger_Minigame_Sounds", true);
                         SelectedPrints.Remove(Selection);
                     }
-
-                    PushInstructionalButtonsFunctions();
                 }
 
-                if (IsControlJustPressed(Control.FrontendRup) && SelectedPrints.Count == 4)
+                if (IsControlJustPressed(Control.FrontendRup) && canRunCheck)
                 {
                     ScramblerSegments = 31;
                     Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "Window_Draw", "DLC_H3_Cas_Finger_Minigame_Sounds", true);
@@ -436,6 +428,30 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                     IsProcessing = true;
                 }
             }
+
+            var defaultPool = new List<Dictionary<Control, string>>
+            {
+                new Dictionary<Control, string> { { Control.FrontendCancel, "Abort Hack (Hold)" } },
+                new Dictionary<Control, string> { { Control.FrontendAccept, "Select" } },
+                new Dictionary<Control, string> { { Control.FrontendRight, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendLeft, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendDown, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendUp, "Move Selector" } }
+            };
+
+            var canRunCheckPool = new List<Dictionary<Control, string>>
+            {
+                new Dictionary<Control, string> { { Control.FrontendCancel, "Abort Hack (Hold)" } },
+                new Dictionary<Control, string> { { Control.FrontendAccept, "Select" } },
+                new Dictionary<Control, string> { { Control.FrontendRup, "Run Check" } },
+                new Dictionary<Control, string> { { Control.FrontendRight, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendLeft, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendDown, string.Empty } },
+                new Dictionary<Control, string> { { Control.FrontendUp, "Move Selector" } }
+            };
+
+            InstructionalButtons?.SetPool(canRunCheck ? canRunCheckPool : defaultPool);
+            InstructionalButtons?.Draw();
         }
 
         private void ShufflePrints()
@@ -467,35 +483,6 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
             }
 
             return true;
-        }
-
-        private void PushInstructionalButtonsFunctions()
-        {
-            if (InstructionalButtons != null)
-            {
-                InstructionalButtons.CallFunction("CLEAR_ALL");
-                InstructionalButtons.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
-                if (SelectedPrints?.Count == 4)
-                {
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 0, "~INPUT_RELOAD~", "Abort Hack (Hold)");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 1, "~INPUT_FRONTEND_ACCEPT~", "Select");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 2, "~INPUT_FRONTEND_RUP~", "Run Check");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 3, "~INPUT_FRONTEND_RIGHT~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 4, "~INPUT_FRONTEND_LEFT~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 5, "~INPUT_FRONTEND_DOWN~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 6, "~INPUT_FRONTEND_UP~", "Move Selector");
-                }
-                else
-                {
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 0, "~INPUT_RELOAD~", "Abort Hack (Hold)");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 1, "~INPUT_FRONTEND_ACCEPT~", "Select");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 2, "~INPUT_FRONTEND_RIGHT~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 3, "~INPUT_FRONTEND_LEFT~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 4, "~INPUT_FRONTEND_DOWN~", "");
-                    InstructionalButtons.CallFunction("SET_DATA_SLOT", 5, "~INPUT_FRONTEND_UP~", "Move Selector");
-                }
-                InstructionalButtons.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS");
-            }
         }
 
         public unsafe void Update()
@@ -534,11 +521,12 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
     Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamewin2") &&
     Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamewin3") &&
     Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggameoverlay") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggameoverlay1") && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match", false, -1) && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking", false, -1))
+    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggameoverlay1") &&
+    Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match", false, -1) && 
+    Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking", false, -1))
                         {
-                            InstructionalButtons = new Scaleform("INSTRUCTIONAL_BUTTONS");
+                            InstructionalButtons = new InstructionalButtons();
                             InstructionalButtons.Load();                           
-                            PushInstructionalButtonsFunctions();
                             AudioScene.Start("DLC_H3_Fingerprint_Hack_Scene");
                             Bink = Function.Call<int>(Hash.SET_BINK_MOVIE, "INTRO_FC");
                             Function.Call(Hash.PLAY_BINK_MOVIE, Bink);
@@ -641,6 +629,8 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                             func_14091("MPFClone_Common", "background_layout", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
                             func_14091("mphackinggameoverlay", "grid_rgb_pixels", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
                             func_14091("mphackinggameoverlay1", "ScreenGrid", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
+
+                            
 
                             if (GameTime - UpdateDiscSetGameTime > 500)
                             {
@@ -822,9 +812,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                 }
                             }
                             func_14091("MPFClone_Common", "Decyphered_Selector", func_14172(TargetPrint), 0.832f, 180f, 180f, 0f, 255, 255, 255, 255, false);
-                            InstructionalButtons.DrawFullscreen();
-                            Controls();
-                            
+
                             if (processing)
                             {
                                 switch (ProcessingIndex)
@@ -932,6 +920,8 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                     }
                                 }
                             }
+
+                            Controls();
                         }
                     }
                     break;
@@ -943,21 +933,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                             Function.Call(Hash.STOP_BINK_MOVIE, Bink);
                             Function.Call(Hash.RELEASE_BINK_MOVIE, Bink);
                             Bink = 0;
-                            AudioScene.Start("DLC_H3_Fingerprint_Hack_Scene");
-
-                            if (State == FingerprintMinigameState.Successful)
-                            {
-                                Prop[] searchDoor = World.GetNearbyProps(Game.Player.Character.Position, 5f, new Model("ch_prop_ch_vault_slide_door_lrg"), new Model("ch_prop_ch_vault_slide_door_sm"));
-
-                                if (searchDoor.Length > 0)
-                                {
-                                    foreach (Prop door in searchDoor)
-                                    {
-                                        door.IsPositionFrozen = false;
-                                    }
-                                }
-                            }
-
+                            AudioScene.Stop("DLC_H3_Fingerprint_Hack_Scene");
                             GameplayCamera.RelativeHeading = 0f;
                             GameplayCamera.RelativePitch = 1f;
                             Index++;
@@ -979,7 +955,6 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                 Function.Call(Hash.RELEASE_BINK_MOVIE, Bink);
                 Bink = 0;
             }
-            // TargetPrint = 1;
             Index = 0;
             Selection = 0;
             Lives = 3;

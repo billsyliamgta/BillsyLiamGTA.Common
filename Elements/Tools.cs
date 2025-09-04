@@ -4,6 +4,8 @@ namespace BillsyLiamGTA.Common.Elements
 {
     public class Tools
     {
+        #region Functions
+
         public static float Clamp(float value, float min, float max)
         {
             if (value < min)
@@ -19,5 +21,7 @@ namespace BillsyLiamGTA.Common.Elements
         }
 
         public static int joaat(string hash) => Function.Call<int>(Hash.GET_HASH_KEY, hash);
+
+        #endregion
     }
 }

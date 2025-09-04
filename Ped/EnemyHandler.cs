@@ -11,7 +11,7 @@ namespace BillsyLiamGTA.Common.Ped
     {
         #region Properties
 
-        private static List<Enemy> enemies = new List<Enemy> { };
+        public static List<Enemy> enemies = new List<Enemy> { };
 
         public static bool IsAlerted => enemies.Any(p => p.IsAlerted);
 
@@ -30,7 +30,9 @@ namespace BillsyLiamGTA.Common.Ped
 
         public static Enemy CreateEnemyPed(Model model, Vector3 position, float heading = 0f, bool provokedMode = false)
         {
+            model.Request(5000);
             GTA.Ped ped = World.CreatePed(model, position, heading);
+            model.MarkAsNoLongerNeeded();
             ped.RelationshipGroup = "GOON";
             ped.RelationshipGroup.SetRelationshipBetweenGroups(Game.Player.Character.RelationshipGroup, Relationship.Dislike);
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(ped.RelationshipGroup, Relationship.Dislike);

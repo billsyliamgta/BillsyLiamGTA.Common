@@ -1,8 +1,10 @@
-﻿using BillsyLiamGTA.Common.Audio;
-using GTA.Native;
+﻿using GTA.Native;
 
 namespace BillsyLiamGTA.Common.Minigames
 {
+    /// <summary>
+    /// Represents the arguments of a minigame value being added.
+    /// </summary>
     public class MinigameValueAddedArgs
     {
         public int Value { get; set; }

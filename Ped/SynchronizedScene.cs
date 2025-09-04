@@ -186,7 +186,7 @@ namespace BillsyLiamGTA.Common.Ped
         /// <param name="ikFlag"></param>
         public void PlayPed(GTA.Ped ped, string animDict, string animName, float blendIn = 8f, float blendOut = 8f, PlaybackFlags flag = PlaybackFlags.NONE, RagdollBlockingFlags ragdollFlag = RagdollBlockingFlags.NONE, float moveBlend = 0x447a0000, IkControlFlags ikFlag = IkControlFlags.NONE)
         {
-            if (IsValid)
+            if (IsValid && ped != null && ped.Exists())
                 Function.Call(Hash.TASK_SYNCHRONIZED_SCENE, ped, Handle, animDict, animName, blendIn, blendOut, (int)flag, (int)ragdollFlag, moveBlend, (int)ikFlag);
         }
 
@@ -202,7 +202,7 @@ namespace BillsyLiamGTA.Common.Ped
         /// <param name="moveBlend"></param>
         public void PlayEntity(Entity entity, string animDict, string animName, float blendIn = 8f, float blendOut = 8f, PlaybackFlags flags = PlaybackFlags.NONE, float moveBlend = 0x447a0000)
         {
-            if (IsValid)
+            if (IsValid && entity != null && entity.Exists())
                 Function.Call(Hash.PLAY_SYNCHRONIZED_ENTITY_ANIM, entity, Handle, animName, animDict, blendIn, blendOut, (int)flags, moveBlend);
         }
 
@@ -260,6 +260,16 @@ namespace BillsyLiamGTA.Common.Ped
                 Function.Call(Hash.SET_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME, Handle, toggle);
         }
 
+        public void DisposeCamera(bool shouldStopRendering)
+        {
+            if (Camera != null && Camera.Exists())
+            {
+                if (shouldStopRendering) ScriptCameraDirector.StopRendering();
+                Camera.Delete();
+                Camera = null;
+            }
+        }
+
         /// <summary>
         /// Dispose the Synchronized Scene if its valid.
         /// </summary>
@@ -269,10 +279,7 @@ namespace BillsyLiamGTA.Common.Ped
             {
                 Function.Call(Hash.TAKE_OWNERSHIP_OF_SYNCHRONIZED_SCENE, Handle);
                 Handle = 0;
-                ScriptCameraDirector.StopRendering();
-                Camera?.Delete();
-                Camera = null;
-                GC.SuppressFinalize(this);
+                DisposeCamera(true);
             }
         }
 

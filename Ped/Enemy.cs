@@ -1,5 +1,4 @@
 ﻿using GTA;
-using GTA.Math;
 using GTA.Native;
 
 namespace BillsyLiamGTA.Common.Ped
@@ -87,12 +86,14 @@ namespace BillsyLiamGTA.Common.Ped
                     {
                         if (!Spotted)
                         {
-                            if (!Handle.Weapons.HasWeapon(WeaponHash.Pistol)) Handle.Weapons.Give(WeaponHash.Pistol, 2000, false, true);
-                            Handle.Weapons.Select(WeaponHash.Pistol);
-                            Handle.Task.ClearAllImmediately();
-                            Function.Call(Hash.TASK_AIM_GUN_AT_ENTITY, Handle, Game.Player.Character, -1, true);
-                            SpottedGameTime = Game.GameTime;
-                            Spotted = true;
+                            bool shouldReact = ProvokedMode && Game.Player.Character.Weapons.Current != WeaponHash.Unarmed || !ProvokedMode;
+                            if (shouldReact)
+                            {
+                                Handle.Task.ClearAllImmediately();
+                                Function.Call(Hash.TASK_AIM_GUN_AT_ENTITY, Handle, Game.Player.Character, -1, true);
+                                SpottedGameTime = Game.GameTime;
+                                Spotted = true;
+                            }                            
                         }
                         else
                         {

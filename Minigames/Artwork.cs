@@ -3,6 +3,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.Ped;
+using GTA.UI;
 
 namespace BillsyLiamGTA.Common.Minigames
 {
@@ -30,11 +31,15 @@ namespace BillsyLiamGTA.Common.Minigames
 
         private int FinishedExitSceneGameTime = 0;
 
+        private float CamBlendOutPhase = 0.999f;
+
+        private int CamBlendOutDuration = 1750;
+
         private int Version = 1;
 
-        private bool _hasSetPaintingUp = false;
+        private bool HasSetPaintingUp = false;
 
-        private bool _exitedWithPainting = false;
+        private bool ExitedWithPainting = false;
 
         #endregion
 
@@ -107,7 +112,7 @@ namespace BillsyLiamGTA.Common.Minigames
 
         public void SetPaintingUp()
         {
-            if (!_hasSetPaintingUp)
+            if (!HasSetPaintingUp)
             {
                 Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
                 int start = Game.GameTime;
@@ -123,11 +128,11 @@ namespace BillsyLiamGTA.Common.Minigames
                 Painting.Rotation = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_top_left_enter_ch_prop_vault_painting_01a", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
                 Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
                 Painting.IsPositionFrozen = true;
-                _hasSetPaintingUp = true;
+                HasSetPaintingUp = true;
             }
         }
 
-        public override void Update()
+        public override unsafe void Update()
         {
             base.Update();
             switch (Index)
@@ -140,8 +145,13 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "FMMC_INT_P7" /* GXT: Press ~INPUT_CONTEXT~ to cut the painting. */, true);
                             if (Game.IsControlJustPressed(Control.Context))
                             {
+                                Screen.ClearHelpText();
+                                Game.Player.Character.CanSwitchWeapons = false;
+                                Game.Player.Character.Weapons.Select(WeaponHash.Unarmed);
+                                ScriptIsInProgress = true;
                                 Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, true);
                                 Function.Call(Hash.LOCK_MINIMAP_ANGLE, 0);
+                                Game.Player.SetControlState(false, SetPlayerControlFlags.LeaveCameraControlOn);
                                 Index++;
                             }
                         }
@@ -152,9 +162,9 @@ namespace BillsyLiamGTA.Common.Minigames
                         Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
                         if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig11_steal_painting@male@") && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS", false, -1))
                         {
-                            Vector3 pos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                            Vector3 rot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                            Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, pos.X, pos.Y, pos.Z, 1f, 5000, rot.Z, 0.75f);
+                            Vector3 offsetPos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
+                            Vector3 offsetRot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
+                            Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, offsetPos.X, offsetPos.Y, offsetPos.Z, 1f, 20000, offsetRot.Z, 0.75f);
                             Index++;
                         }
                     }
@@ -166,20 +176,38 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 0, 0, 0);
                             string clip = string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip;
                             Bag = World.CreateProp("hei_p_m_bag_var22_arm_s", Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_hei_p_m_bag_var22_arm_s", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2), Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_hei_p_m_bag_var22_arm_s", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2), false, false);
-                            Bag.IsCollisionEnabled = false;
+                            if (Bag != null && Bag.Exists())
+                            {
+                                Bag.IsCollisionEnabled = false;
+                                Bag.IsVisible = false;
+                            }
                             Knife = World.CreateProp("w_me_switchblade", Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_w_me_switchblade", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2), Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_w_me_switchblade", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2), false, false);
-                            Knife.IsCollisionEnabled = false;
+                            if (Knife != null && Knife.Exists())
+                            {
+                                Knife.IsCollisionEnabled = false;
+                                Knife.IsVisible = false;
+                            }
                             PlayerScene = new SynchronizedScene(Cabinet.Position, Cabinet.Rotation);
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", clip, 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_hei_p_m_bag_var22_arm_s");
-                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@",  clip + "_w_me_switchblade");
-                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
-                            PlayerScene.PlayEntity(Cabinet, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_ch_prop_ch_sec_cabinet_02a");
-                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Cabinet);
-                            PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", clip + "_cam_ble");                    
-                            if (clip == $"ver_0{Version}_top_left_enter")
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
+                            if (Cabinet != null && Cabinet.Exists())
+                            {
+                                PlayerScene.PlayEntity(Cabinet, "anim_heist@hs3f@ig11_steal_painting@male@", clip + "_ch_prop_ch_sec_cabinet_02a");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Cabinet);
+                            }
+                            PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", clip + "_cam_ble");
+                            if (clip == $"ver_0{Version}_top_left_enter" && Painting != null && Painting.Exists())
                             {
                                 PaintingScene = new SynchronizedScene(Cabinet.Position, Cabinet.Rotation);
                                 PaintingScene.Generate();
@@ -192,7 +220,11 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 3:
                     {
-                        if (PlayerScene.IsFinished)
+                        if (Bag != null && Bag.Exists() && !Bag.IsVisible && PlayerScene != null && PlayerScene.Phase > 0f) Bag.IsVisible = true;
+
+                        if (Knife != null && Knife.Exists() && !Knife.IsVisible && PlayerScene != null && PlayerScene.Phase > 0f) Knife.IsVisible = true;
+
+                        if (PlayerScene != null && PlayerScene.IsFinished)
                         {
                             if (ResumeIndex == 0)
                             {
@@ -211,26 +243,53 @@ namespace BillsyLiamGTA.Common.Minigames
                         {
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_cam");
                             PlayerScene.SetLooped(true);
-                            PaintingScene.Generate();
-                            PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_ch_prop_vault_painting_01a");
-                            PaintingScene.SetLooped(true);
+                            if (PaintingScene != null && Painting != null && Painting.Exists())
+                            {
+                                PaintingScene.Generate();
+                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_ch_prop_vault_painting_01a");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                                PaintingScene.SetLooped(true);
+                            }
                         }
                         else
                         {
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "MC_INTOBJ_CP_R" /* GXT: ~s~~INPUT_MOVE_RIGHT_ONLY~ to cut right ~n~Press ~INPUT_SCRIPT_RRIGHT~ to exit. */, false);
                             if (Game.IsControlJustPressed(Control.MoveRightOnly))
                             {
+                                Screen.ClearHelpText();
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_hei_p_m_bag_var22_arm_s");
-                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_w_me_switchblade");
+                                Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                                if (Bag != null && Bag.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_hei_p_m_bag_var22_arm_s");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                                }
+                                if (Knife != null && Knife.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_w_me_switchblade");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                                }
                                 PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_cam");
-                                PaintingScene.Generate();
-                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_ch_prop_vault_painting_01a");
+                                if (PaintingScene != null && Painting != null && Painting.Exists())
+                                {
+                                    PaintingScene.Generate();
+                                    PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_to_right_ch_prop_vault_painting_01a");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                                }
                                 Index++;
                             }
                             if (Game.IsControlJustPressed(Control.ScriptRRight))
@@ -245,10 +304,7 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 5:
                     {
-                        if (PlayerScene.IsFinished)
-                        {
-                            Index++;
-                        }
+                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
                     }
                     break;
                 case 6:
@@ -257,8 +313,17 @@ namespace BillsyLiamGTA.Common.Minigames
                         {
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_hei_p_m_bag_var22_arm_s");
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_w_me_switchblade");
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_cam");
                             PlayerScene.SetLooped(true);
                         }
@@ -267,13 +332,27 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "MC_INTOBJ_CP_D" /* GXT: ~s~~INPUT_MOVE_DOWN_ONLY~ to cut down ~n~Press ~INPUT_SCRIPT_RRIGHT~ to exit. */, false);
                             if (Game.IsControlJustPressed(Control.MoveDownOnly))
                             {
+                                Screen.ClearHelpText();
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_hei_p_m_bag_var22_arm_s");
-                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_w_me_switchblade");
+                                Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                                if (Bag != null && Bag.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_hei_p_m_bag_var22_arm_s");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                                }
+                                if (Knife != null && Knife.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_w_me_switchblade");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                                }
                                 PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_cam");
-                                PaintingScene.Generate();
-                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_ch_prop_vault_painting_01a");
+                                if (PaintingScene != null && Painting != null && Painting.Exists())
+                                {
+                                    PaintingScene.Generate();
+                                    PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_right_top_to_bottom_ch_prop_vault_painting_01a");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                                }
                                 Index++;
                             }
                             if (Game.IsControlJustPressed(Control.ScriptRRight))
@@ -288,10 +367,7 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 7:
                     {
-                        if (PlayerScene.IsFinished)
-                        {
-                            Index++;
-                        }
+                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
                     }
                     break;
                 case 8:
@@ -300,8 +376,17 @@ namespace BillsyLiamGTA.Common.Minigames
                         {
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_hei_p_m_bag_var22_arm_s");
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_w_me_switchblade");
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_cam");
                             PlayerScene.SetLooped(true);
                         }
@@ -310,13 +395,27 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "MC_INTOBJ_CP_L" /* GXT: ~s~~INPUT_MOVE_LEFT_ONLY~ to cut left ~n~Press ~INPUT_SCRIPT_RRIGHT~ to exit. */, false);
                             if (Game.IsControlJustPressed(Control.MoveLeftOnly))
                             {
+                                Screen.ClearHelpText();
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_hei_p_m_bag_var22_arm_s");
-                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_w_me_switchblade");
+                                Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                                if (Bag != null && Bag.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_hei_p_m_bag_var22_arm_s");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                                }
+                                if (Knife != null && Knife.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_w_me_switchblade");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                                }
                                 PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_cam");
-                                PaintingScene.Generate();
-                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_ch_prop_vault_painting_01a");
+                                if (PaintingScene != null && Painting != null && Painting.Exists())
+                                {
+                                    PaintingScene.Generate();
+                                    PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_to_left_ch_prop_vault_painting_01a");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                                }
                                 Index++;
                             }
                             if (Game.IsControlJustPressed(Control.ScriptRRight))
@@ -331,10 +430,7 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 9:
                     {
-                        if (PlayerScene.IsFinished)
-                        {
-                            Index++;
-                        }
+                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
                     }
                     break;
                 case 10:
@@ -343,8 +439,17 @@ namespace BillsyLiamGTA.Common.Minigames
                         {
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_cam");
                             PlayerScene.SetLooped(true);
                         }
@@ -353,14 +458,27 @@ namespace BillsyLiamGTA.Common.Minigames
                             Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "MC_INTOBJ_CP_D" /* GXT: ~s~~INPUT_MOVE_DOWN_ONLY~ to cut down ~n~Press ~INPUT_SCRIPT_RRIGHT~ to exit. */, false);
                             if (Game.IsControlJustPressed(Control.MoveDownOnly))
                             {
+                                Screen.ClearHelpText();
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_hei_p_m_bag_var22_arm_s");
-                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_w_me_switchblade");
+                                Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                                if (Bag != null && Bag.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_hei_p_m_bag_var22_arm_s");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                                }
+                                if (Knife != null && Knife.Exists())
+                                {
+                                    PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_w_me_switchblade");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                                }
                                 PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_cam");
-                                PaintingScene = new SynchronizedScene(Cabinet.Position, Cabinet.Rotation);
-                                PaintingScene.Generate();
-                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_ch_prop_vault_painting_01a");                           
+                                if (PaintingScene != null && Painting != null && Painting.Exists())
+                                {
+                                    PaintingScene.Generate();
+                                    PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_left_top_to_bottom_ch_prop_vault_painting_01a");
+                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                                }
                                 Index++;
                             }
                             if (Game.IsControlJustPressed(Control.ScriptRRight))
@@ -375,35 +493,49 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 11:
                     {
-                        if (PlayerScene.IsFinished)
+                        if (PlayerScene != null && PlayerScene.IsFinished)
                         {
-                            Function.Call(Hash.CLEAR_HELP, true);
+                            Screen.ClearHelpText();
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_hei_p_m_bag_var22_arm_s");
-                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_w_me_switchblade");
-                            PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", Version == 2 ? "ver_02_with_painting_exit_cam" : "ver_01_with_painting_exit_cam_re1");
-                            PaintingScene = new SynchronizedScene(Cabinet.Position, Cabinet.Rotation);
-                            PaintingScene.Generate();
-                            PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_ch_prop_vault_painting_01a");
-                            _exitedWithPainting = true;
+                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                            if (Bag != null && Bag.Exists())
+                            {
+                                PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_hei_p_m_bag_var22_arm_s");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                            }
+                            if (Knife != null && Knife.Exists())
+                            {
+                                PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_w_me_switchblade");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                            }
+                            string camClip = Version == 2 ? "ver_02_with_painting_exit_cam" : "ver_01_with_painting_exit_cam_re1";
+                            PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", camClip);
+                            if (PaintingScene != null && Painting != null && Painting.Exists())
+                            {
+                                PaintingScene.Generate();
+                                PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_with_painting_exit_ch_prop_vault_painting_01a");
+                                Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Painting);
+                            }
+                            float camBlendOutPhase = 0f, unknownParam = 0f;
+                            if (Function.Call<bool>(Hash.FIND_ANIM_EVENT_PHASE, "anim_heist@hs3f@ig11_steal_painting@male@", camClip, "CamBlendOut", &camBlendOutPhase, &unknownParam))
+                            {
+                            }
+                            CamBlendOutPhase = camBlendOutPhase;
+                            CamBlendOutDuration = 1750;
+                            ExitedWithPainting = true;
                             Index++;
                         }
                     }
                     break;
                 case 12:
                     {
-                        if (PlayerScene.Phase >= 0.8f)
+                        if (PlayerScene != null && PlayerScene.Phase > CamBlendOutPhase)
                         {
-                            if (_exitedWithPainting)
-                            {
-                                ValueAdded.Invoke(this, new MinigameValueAddedArgs(Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, 400000, 600000), true));
-                                IsLooted = true;
-                            }
                             Game.Player.SetControlState(false);
-                            GameplayCamera.RelativeHeading = 0f;
-                            GameplayCamera.RelativePitch = 1f;
-                            Function.Call(Hash.RENDER_SCRIPT_CAMS, false, 1, 1500, 1, 0);
+                            Function.Call(Hash.SET_GAMEPLAY_CAM_RELATIVE_PITCH, 0f, 1f);
+                            Function.Call(Hash.SET_GAMEPLAY_CAM_RELATIVE_HEADING, 0f);
+                            Function.Call(Hash.RENDER_SCRIPT_CAMS, false, true, CamBlendOutDuration, true, false, 0);
                             FinishedExitSceneGameTime = Game.GameTime;
                             Index++;
                         }
@@ -411,54 +543,88 @@ namespace BillsyLiamGTA.Common.Minigames
                     break;
                 case 13:
                     {
-                        if (Game.GameTime - FinishedExitSceneGameTime > 1500 && PlayerScene.IsFinished)
+                        if (Game.GameTime - FinishedExitSceneGameTime > CamBlendOutDuration && PlayerScene != null && PlayerScene.IsFinished)
                         {
+                            if (ExitedWithPainting)
+                            {
+                                ValueAdded.Invoke(this, new MinigameValueAddedArgs(Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, 400000, 600000), true));
+                                IsLooted = true;
+                            }
                             PlayerScene?.Dispose();
                             PlayerScene = null;
+                            Game.Player.Character.CanSwitchWeapons = true;
+                            ScriptIsInProgress = false;
                             Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
                             Function.Call(Hash.UNLOCK_MINIMAP_ANGLE);
-                            Bag?.Delete();
-                            Bag = null;
+                            if (Bag != null && Bag.Exists())
+                            {
+                                Bag.Delete();
+                                Bag = null;
+                            }
                             Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 45, 0, 0);
-                            Knife?.Delete();
-                            Knife = null;
-                            Game.Player.SetControlState(true);
-                            Game.Player.Character.Task.ClearAll();
+                            if (Knife != null && Knife.Exists())
+                            {
+                                Knife.Delete();
+                                Knife = null;
+                            }
                             Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
                             Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
+                            Game.Player.SetControlState(true);
+                            Game.Player.Character.Task.ClearAll();
                             Index = 0;
                         }
                     }
                     break;
                 case 14:
                     {
-                        Function.Call(Hash.CLEAR_HELP, true);
+                        Screen.ClearHelpText();
                         PlayerScene.Generate();
                         PlayerScene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip, 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                        PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_hei_p_m_bag_var22_arm_s");
-                        PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_w_me_switchblade");
+                        Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
+                        if (Bag != null && Bag.Exists())
+                        {
+                            PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_hei_p_m_bag_var22_arm_s");
+                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Bag);
+                        }
+                        if (Knife != null && Knife.Exists())
+                        {
+                            PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_w_me_switchblade");
+                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Knife);
+                        }
                         PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_cam");
+                        float camBlendOutPhase = 0f, unknownParam = 0f;
+                        if (Function.Call<bool>(Hash.FIND_ANIM_EVENT_PHASE, "anim_heist@hs3f@ig11_steal_painting@male@", ExitClip + "_cam", "CamBlendOut", &camBlendOutPhase, &unknownParam))
+                        {
+                        }
+                        CamBlendOutPhase = camBlendOutPhase;
+                        CamBlendOutDuration = 1750;
                         Index = 12;
                     }
                     break;
             }
         }
 
-        public override void PushDeathResetFunc()
+        public override void PushDeathResetFunction()
         {
-            base.PushDeathResetFunc();
-            Cabinet?.Delete();
-            Cabinet = null;
-            Painting?.Delete();
-            Painting = null;
-            Bag?.Delete();
-            Bag = null;
-            Knife?.Delete();
-            Knife = null;
+            base.PushDeathResetFunction();
+            if (Bag != null && Bag.Exists())
+            {
+                Bag.Delete();
+                Bag = null;
+            }
+
+            if (Knife != null && Knife.Exists())
+            {
+                Knife.Delete();
+                Knife = null;
+            }
+
             PlayerScene?.Dispose();
             PlayerScene = null;
+
             PaintingScene?.Dispose();
             PaintingScene = null;
+
             Function.Call(Hash.UNLOCK_MINIMAP_ANGLE);
             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 2);
             Game.Player.SetControlState(true);
@@ -470,26 +636,44 @@ namespace BillsyLiamGTA.Common.Minigames
         public override void Dispose()
         {
             base.Dispose();
-            Cabinet?.Delete();
-            Cabinet = null;
-            Painting?.Delete();
-            Painting = null;
-            Bag?.Delete();
-            Bag = null;
-            Knife?.Delete();
-            Knife = null;
+            if (Cabinet != null && Cabinet.Exists())
+            {
+                Cabinet.Delete();
+                Cabinet = null;
+            }
+
+            if (Painting != null && Painting.Exists())
+            {
+                Painting.Delete();
+                Painting = null;
+            }
+            
+            if (Bag != null && Bag.Exists())
+            {
+                Bag.Delete();
+                Bag = null;
+            }
+
+            if (Knife != null && Knife.Exists())
+            {
+                Knife.Delete();
+                Knife = null;
+            }
+
             PlayerScene?.Dispose();
             PlayerScene = null;
+
             PaintingScene?.Dispose();
-            PaintingScene = null;
+            PaintingScene = null;;
+
             ResumeClip = string.Empty;
             ExitClip = string.Empty;
             ResumeIndex = 0;
             FinishedExitSceneGameTime = 0;
             Version = 1;
-            _hasSetPaintingUp = false;
-            _exitedWithPainting = false;
-            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
+            HasSetPaintingUp = false;
+            ExitedWithPainting = false;
+            Game.Player.Character.CanSwitchWeapons = true;
             Function.Call(Hash.UNLOCK_MINIMAP_ANGLE);
             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 2);
             Game.Player.SetControlState(true);

@@ -18,13 +18,15 @@ namespace BillsyLiamGTA.Common.Minigames
             public float f_15;
         }
 
-        public unsafe MinigameStruct Local_29575;
+        public unsafe MinigameStruct Data;
 
         public virtual float MinRate { get; set; } = 0.75f;
 
         public virtual float MaxRate { get; set; } = 1.5f;
 
         public int Index { get; set; } = 0;
+
+        public bool ScriptIsInProgress { get; set; } = false;
 
         public bool IsLooted { get; set; } = false;
 
@@ -136,36 +138,36 @@ namespace BillsyLiamGTA.Common.Minigames
 
         public virtual unsafe void Update()
         {
-            if (Game.Player.Character.IsDead && Index > 0)
-            {
-                PushDeathResetFunc();
-            }
+            if (Game.Player.Character.IsDead && ScriptIsInProgress) PushDeathResetFunction();
 
-            fixed (MinigameStruct* pData = &Local_29575)
-            {
-                func_7677(pData, MinRate, MaxRate);
-            }
+            fixed (MinigameStruct* pData = &Data) func_7677(pData, MinRate, MaxRate);
         }
 
         /// <summary>
-        /// If the minigame is in progress, and the player dies, this function will be called.
+        /// If the minigame is in progress, and the player dies this function will be called.
         /// </summary>
-        public virtual void PushDeathResetFunc()
+        public virtual void PushDeathResetFunction()
         {
             Index = 0;
+            ScriptIsInProgress = false;
             Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
+            Game.Player.Character.CanSwitchWeapons = true;
+            Game.Player.SetControlState(true);
+            Game.Player.Character.Task.ClearAllImmediately();
         }
 
         public virtual void Dispose()
         {
-            Local_29575.f_1 = 0;
-            Local_29575.f_13 = 0f;
-            Local_29575.f_14 = 0f;
-            Local_29575.f_15 = 0f;
+            Data.f_1 = 0;
+            Data.f_13 = 0f;
+            Data.f_14 = 0f;
+            Data.f_15 = 0f;
             MinRate = 0.75f;
             MaxRate = 1.5f;
             Index = 0;
+            ScriptIsInProgress = false;
             IsLooted = false;
+            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
         }
 
         #endregion
