@@ -11,7 +11,7 @@ namespace BillsyLiamGTA.Common.Minigames
         {
             public int f_1;
 
-            public float f_13;
+            public float Phase;
 
             public float f_14;
 
@@ -26,15 +26,29 @@ namespace BillsyLiamGTA.Common.Minigames
 
         public int Index { get; set; } = 0;
 
+        public bool NativeInProgress
+        {
+            get
+            {
+                return Function.Call<bool>(Hash.IS_MINIGAME_IN_PROGRESS);
+            }
+            set
+            {
+                Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, value);
+            }
+        }
+
         public bool ScriptIsInProgress { get; set; } = false;
 
         public bool IsLooted { get; set; } = false;
 
         public MinigameValueAddedEventHandler ValueAdded { get; set; }
 
+        public BagManager.BagVariantType PreviousBagType;
+
         #endregion
 
-        #region Functions
+        #region Functions     
 
         public float func_350(float fParam0, float fParam1, float fParam2)//Position - 0xD36B
         {
@@ -136,6 +150,12 @@ namespace BillsyLiamGTA.Common.Minigames
             }
         }
 
+        public void SetInProgress(bool toggle)
+        {
+            NativeInProgress = toggle;
+            ScriptIsInProgress = toggle;
+        }
+
         public virtual unsafe void Update()
         {
             if (Game.Player.Character.IsDead && ScriptIsInProgress) PushDeathResetFunction();
@@ -149,26 +169,28 @@ namespace BillsyLiamGTA.Common.Minigames
         public virtual void PushDeathResetFunction()
         {
             Index = 0;
-            ScriptIsInProgress = false;
-            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
+            SetInProgress(false);
             Game.Player.Character.CanSwitchWeapons = true;
             Game.Player.SetControlState(true);
             Game.Player.Character.Task.ClearAllImmediately();
+            BagManager.SetBagFromVariantType(Game.Player.Character, PreviousBagType);
         }
 
-        public virtual void Dispose()
+        public void ResetGlobals()
         {
             Data.f_1 = 0;
-            Data.f_13 = 0f;
+            Data.Phase = 0f;
             Data.f_14 = 0f;
             Data.f_15 = 0f;
             MinRate = 0.75f;
             MaxRate = 1.5f;
             Index = 0;
-            ScriptIsInProgress = false;
+            SetInProgress(false);
             IsLooted = false;
-            Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, false);
+            PreviousBagType = BagManager.BagVariantType.Invalid;
         }
+
+        public virtual void Dispose() => ResetGlobals();
 
         #endregion
     }

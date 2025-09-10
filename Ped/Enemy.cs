@@ -109,8 +109,10 @@ namespace BillsyLiamGTA.Common.Ped
 
         public void Dispose()
         {
-            if (Handle.AttachedBlip != null && Handle.AttachedBlip.Exists()) Handle.AttachedBlip.Delete();
-            if (Handle != null && Handle.Exists()) Handle.Delete();
+            if (Handle.AttachedBlip != null && Handle.AttachedBlip.Exists())
+                Handle.AttachedBlip.Delete();
+            if (Handle != null && Handle.Exists()) 
+                Handle.Delete();
             _isAlerted = false;
             SpottedGameTime = 0;
             Spotted = false;

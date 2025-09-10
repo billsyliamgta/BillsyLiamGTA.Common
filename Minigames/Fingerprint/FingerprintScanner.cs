@@ -55,6 +55,8 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
 
         private int ThermalBurnPtfxStartedGameTime = 0;
 
+        private BagManager.BagVariantType PreviousBagType;
+
         private Prop Bag;
 
         private SynchronizedScene Scene;
@@ -128,110 +130,101 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                 {
                                     if (Function.Call<int>(Hash.GET_SCRIPT_TASK_STATUS, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "SCRIPT_TASK_GO_STRAIGHT_TO_COORD")) == 7)
                                     {
-                                        Model usbModel = new Model("ch_prop_ch_usb_drive01x");
-                                        usbModel.Request(5000);
-                                        USB = World.CreateProp(usbModel, Game.Player.Character.Position, false, false);
-                                        usbModel.MarkAsNoLongerNeeded();
-                                        USB.IsCollisionEnabled = false;
-                                        Model phoneModel = new Model("prop_phone_ing");
-                                        phoneModel.Request(5000);
-                                        Phone = World.CreateProp(phoneModel, Game.Player.Character.Position, false, false);
-                                        phoneModel.MarkAsNoLongerNeeded();
-                                        Phone.IsCollisionEnabled = false;
+                                        USB = World.CreateProp("ch_prop_ch_usb_drive01x", Game.Player.Character.Position, false, false);
+                                        if (USB != null && USB.Exists())
+                                            USB.IsCollisionEnabled = false;
+                                        Phone = World.CreateProp("prop_phone_ing", Game.Player.Character.Position, false, false);
+                                        if (Phone != null && Phone.Exists())
+                                            Phone.IsCollisionEnabled = false;
                                         Scene = new SynchronizedScene(Keypad.Position, Keypad.Rotation);
                                         Scene.Generate();
                                         Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "action_var_01", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
                                         Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "action_var_01_ch_prop_ch_usb_drive01x");
                                         Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "action_var_01_prop_phone_ing");
-                                        Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
-                                        Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, USB);
-                                        Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Phone);
                                         Index++;
                                     }
                                 }
                                 break;
                             case 2:
                                 {
-                                    if (Scene.IsFinished)
+                                    if (Scene != null && Scene.IsFinished)
                                     {
                                         Scene.Generate();
                                         Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
                                         Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01_ch_prop_ch_usb_drive01x");
                                         Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01_prop_phone_ing");
                                         Scene.SetLooped(true);
-                                        Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
-                                        Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, USB);
-                                        Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Phone);
-                                        Minigame = new FingerprintMinigame(PrintsToHack);
                                         Index++;
                                     }
                                 }
                                 break;
                             case 3:
                                 {
-                                    Minigame.Update();
-
-                                    if (Minigame.IsInactive || isDead)
+                                    if (Minigame == null)
                                     {
-                                        Scene.Generate();
-
-                                        if (!isDead && USB != null && USB.Exists() && Phone != null && Phone.Exists())
-                                        {
-                                            switch (Minigame.State)
-                                            {
-                                                case FingerprintMinigame.FingerprintMinigameState.Aborted:
-                                                    {
-                                                        Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                                        Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit_ch_prop_ch_usb_drive01x");
-                                                        Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit_prop_phone_ing");
-                                                        CanBeUsed = true;
-                                                    }
-                                                    break;
-                                                case FingerprintMinigame.FingerprintMinigameState.Failed:
-                                                    {
-                                                        Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                                        Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react_ch_prop_ch_usb_drive01x");
-                                                        Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react_prop_phone_ing");
-                                                        CanBeUsed = true;
-                                                    }
-                                                    break;
-                                                case FingerprintMinigame.FingerprintMinigameState.Successful:
-                                                    {
-                                                        Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                                        Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01_ch_prop_ch_usb_drive01x");
-                                                        Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01_prop_phone_ing");
-                                                        OpenNearbyDoor();
-                                                        CanBeUsed = false;
-                                                    }
-                                                    break;
-                                            }
-                                            Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
-                                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, USB);
-                                            Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Phone);
-                                        }
-
-                                        Minigame.Dispose();
-                                        Minigame = null;
-                                        Index++;
+                                        Minigame = new FingerprintMinigame(PrintsToHack);
                                     }
+                                    else
+                                    {
+                                        Minigame.Update();
+
+                                        if (Minigame.IsInactive || isDead)
+                                        {
+                                            Scene.Generate();
+
+                                            if (!isDead && USB != null && USB.Exists() && Phone != null && Phone.Exists())
+                                            {
+                                                switch (Minigame.State)
+                                                {
+                                                    case FingerprintMinigame.FingerprintMinigameState.Aborted:
+                                                        {
+                                                            Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
+                                                            Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit_ch_prop_ch_usb_drive01x");
+                                                            Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "exit_prop_phone_ing");
+                                                            CanBeUsed = true;
+                                                        }
+                                                        break;
+                                                    case FingerprintMinigame.FingerprintMinigameState.Failed:
+                                                        {
+                                                            Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
+                                                            Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react_ch_prop_ch_usb_drive01x");
+                                                            Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "fail_react_prop_phone_ing");
+                                                            CanBeUsed = true;
+                                                        }
+                                                        break;
+                                                    case FingerprintMinigame.FingerprintMinigameState.Successful:
+                                                        {
+                                                            Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
+                                                            Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01_ch_prop_ch_usb_drive01x");
+                                                            Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "success_react_exit_var_01_prop_phone_ing");
+                                                            OpenNearbyDoor();
+                                                            CanBeUsed = false;
+                                                        }
+                                                        break;
+                                                }
+                                            }
+
+                                            Minigame.Dispose();
+                                            Minigame = null;
+                                            Index++;
+                                        }
+                                    }  
                                 }
                                 break;
                             case 4:
                                 {
-                                    if (Scene.IsFinished || isDead)
+                                    if (Scene != null && Scene.IsFinished || isDead)
                                     {
                                         if (USB != null && USB.Exists())
                                         {
                                             USB.Delete();
                                             USB = null;
                                         }
-
                                         if (Phone != null && Phone.Exists())
                                         {
                                             Phone.Delete();
                                             Phone = null;
                                         }
-
                                         Game.Player.Character.Task.ClearAll();
                                         Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig1_hack_keypad@male@");
                                         Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), false);
@@ -253,16 +246,17 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                         Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig3_cardswipe@male@");
                                         if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig3_cardswipe@male@"))
                                         {
-                                            Vector3 posOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig3_cardswipe@male@", "success_var01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
-                                            Vector3 rotOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig3_cardswipe@male@", "success_var01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
-                                            if (!isDead && Game.Player.Character.Position.DistanceTo(posOffset) < 1.5f)
+                                            Vector3 offsetPos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig3_cardswipe@male@", "success_var01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
+                                            Vector3 offsetRot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig3_cardswipe@male@", "success_var01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
+                                            if (!isDead && Game.Player.Character.Position.DistanceTo(offsetRot) < 1f)
                                             {
                                                 Screen.ShowHelpTextThisFrame("Press ~INPUT_CONTEXT~ to swipe your keycard.");
                                                 if (Game.IsControlJustPressed(Control.Context))
                                                 {
                                                     Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), true);
                                                     Function.Call(Hash.SET_PED_USING_ACTION_MODE, Game.Player.Character, false, "DEFAULT_ACTION");
-                                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, posOffset.X, posOffset.Y, posOffset.Z, 1f, 5000, rotOffset.Z, 0.1f);
+                                                    Game.Player.SetControlState(false, SetPlayerControlFlags.LeaveCameraControlOn);
+                                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, offsetPos.X, offsetPos.Y, offsetPos.Z, 1f, 20000, offsetRot.Z, 0.1f);
                                                     Index++;
                                                 }
                                             }
@@ -274,18 +268,14 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                 {
                                     if (Function.Call<int>(Hash.GET_SCRIPT_TASK_STATUS, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "SCRIPT_TASK_GO_STRAIGHT_TO_COORD")) == 7)
                                     {
-                                        Model cardModel = new Model("ch_prop_swipe_card_01b");
-                                        cardModel.Request(5000);
-                                        Card = World.CreateProp(cardModel, Game.Player.Character.Position, false, false);
-                                        cardModel.MarkAsNoLongerNeeded();
-                                        Card.IsCollisionEnabled = false;
+                                        Card = World.CreateProp("ch_prop_swipe_card_01b", Game.Player.Character.Position, false, false);
+                                        if (Card != null && Card.Exists())
+                                            Card.IsCollisionEnabled = false;
                                         int rng = Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, 1, 4);
                                         Scene = new SynchronizedScene(Keypad.Position, Keypad.Rotation);
                                         Scene.Generate();
                                         Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig3_cardswipe@male@", $"success_var0{rng}", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
                                         Scene.PlayEntity(Card, "anim_heist@hs3f@ig3_cardswipe@male@", $"success_var0{rng}_card");
-                                        Function.Call(Hash.FORCE_PED_AI_AND_ANIMATION_UPDATE, Game.Player.Character, false, false);
-                                        Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Card);
                                         Index++;
                                     }
                                 }
@@ -305,6 +295,7 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                             Scene = null;
                                             Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig3_cardswipe@male@");
                                             Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), false);
+                                            Game.Player.SetControlState(true);
                                             Game.Player.Character.Task.ClearAll();
                                             OpenNearbyDoor();
                                             CanBeUsed = false;
@@ -329,16 +320,17 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                         Function.Call(Hash.REQUEST_NAMED_PTFX_ASSET, "scr_ch_finale");
                                         if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@") && Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim@heists@ornate_bank@thermal_charge") && Function.Call<bool>(Hash.HAS_NAMED_PTFX_ASSET_LOADED, "scr_ch_finale"))
                                         {
-                                            Vector3 posOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@", "thermal_charge_male_male", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
-                                            Vector3 rotOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@", "thermal_charge_male_male", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
-                                            if (!isDead && Game.Player.Character.Position.DistanceTo(posOffset) < 1.5f)
+                                            Vector3 offsetPos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@", "thermal_charge_male_male", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
+                                            Vector3 offsetRot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@", "thermal_charge_male_male", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
+                                            if (!isDead && Game.Player.Character.Position.DistanceTo(offsetPos) < 1f)
                                             {
                                                 Screen.ShowHelpTextThisFrame("Press ~INPUT_CONTEXT~ to place the thermal charge.");
                                                 if (Game.IsControlJustPressed(Control.Context))
                                                 {
                                                     Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), true);
                                                     Function.Call(Hash.SET_PED_USING_ACTION_MODE, Game.Player.Character, false, "DEFAULT_ACTION");
-                                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, posOffset.X, posOffset.Y, posOffset.Z, 1f, 5000, rotOffset.Z, 0.1f);
+                                                    Game.Player.SetControlState(false, SetPlayerControlFlags.LeaveCameraControlOn);
+                                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, offsetPos.X, offsetPos.Y, offsetPos.Z, 1f, 20000, offsetRot.Z, 0.1f);
                                                     Index++;
                                                 }
                                             }
@@ -350,17 +342,19 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                 {
                                     if (Function.Call<int>(Hash.GET_SCRIPT_TASK_STATUS, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "SCRIPT_TASK_GO_STRAIGHT_TO_COORD")) == 7)
                                     {
-                                        Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 0, 0, 0);
-                                        Model thermiteModel = new Model("hei_prop_heist_thermite");
-                                        thermiteModel.Request(5000);
-                                        Thermite = World.CreateProp(thermiteModel, Game.Player.Character.Position, false, false);
-                                        thermiteModel.MarkAsNoLongerNeeded();
-                                        Thermite.IsCollisionEnabled = false;
-                                        Model bagModel = new Model("hei_p_m_bag_var22_arm_s");
-                                        bagModel.Request(5000);
-                                        Bag = World.CreateProp(bagModel, Game.Player.Character.Position, false, false);
-                                        bagModel.MarkAsNoLongerNeeded();
-                                        Bag.IsCollisionEnabled = false;
+                                        Thermite = World.CreateProp("hei_prop_heist_thermite", Game.Player.Character.Position, false, false);
+                                        if (Thermite != null && Thermite.Exists())
+                                        {
+                                            Thermite.IsCollisionEnabled = false;
+                                            Thermite.IsVisible = false;
+                                        }
+                                        PreviousBagType = BagManager.GetBagVariantTypeFromPed(Game.Player.Character);
+                                        Bag = BagManager.CreateBagPropFromPed(Game.Player.Character);
+                                        if (Bag != null && Bag.Exists())
+                                        {
+                                            Bag.IsCollisionEnabled = false;
+                                            Bag.IsVisible = false;
+                                        }
                                         Scene = new SynchronizedScene(Keypad.Position, Keypad.Rotation);
                                         Scene.Generate();
                                         Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig13_thermal_charge@thermal_charge@male@", "thermal_charge_male_male", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
@@ -375,26 +369,33 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                                 break;
                             case 2:
                                 {
-                                    if (Scene != null)
+                                    if (Thermite != null && Thermite.Exists() && !Thermite.IsVisible && Scene != null && Scene.Phase > 0f)
+                                        Thermite.IsVisible = true;
+
+                                    if (Bag != null && Bag.Exists() && !Bag.IsVisible && Scene != null && Scene.Phase > 0f)
                                     {
-                                        if (Scene.IsFinished)
+                                        BagManager.RemoveBag(Game.Player.Character);
+                                        Bag.IsVisible = true;
+                                    }
+
+                                    if (Scene.IsFinished)
+                                    {
+                                        if (Bag != null && Bag.Exists())
                                         {
-                                            if (Bag != null && Bag.Exists())
-                                            {
-                                                Bag.Delete();
-                                                Bag = null;
-                                            }
-                                            Scene.Dispose();
-                                            Scene = null;
-                                            Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Game.Player.Character, 5, 45, 0, 0);
-                                            Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), false);
-                                            Game.Player.Character.Task.ClearAll();
-                                            Function.Call(Hash.USE_PARTICLE_FX_ASSET, "scr_ch_finale");
-                                            ThermalBurnPtfxHandle = Function.Call<int>(Hash.START_PARTICLE_FX_LOOPED_ON_ENTITY, "scr_ch_finale_thermal_burn", Thermite, 0f, 0f, 0f, 0f, 0f, 0f, 1f, false, false, false);
-                                            ThermalBurnPtfxStartedGameTime = Game.GameTime;
-                                            CanBeUsed = false;
-                                            Index++;
+                                            Bag.Delete();
+                                            Bag = null;
                                         }
+                                        BagManager.SetBagFromVariantType(Game.Player.Character, PreviousBagType);
+                                        Scene.Dispose();
+                                        Scene = null;
+                                        Function.Call(Hash.SET_EVERYONE_IGNORE_PLAYER, Function.Call<int>(Hash.PLAYER_ID), false);
+                                        Game.Player.SetControlState(true);
+                                        Game.Player.Character.Task.ClearAll();
+                                        Function.Call(Hash.USE_PARTICLE_FX_ASSET, "scr_ch_finale");
+                                        ThermalBurnPtfxHandle = Function.Call<int>(Hash.START_PARTICLE_FX_LOOPED_ON_ENTITY, "scr_ch_finale_thermal_burn", Thermite, 0f, 0f, 0f, 0f, 0f, 0f, 1f, false, false, false);
+                                        ThermalBurnPtfxStartedGameTime = Game.GameTime;
+                                        CanBeUsed = false;
+                                        Index++;
                                     }
                                 }
                                 break;
@@ -495,6 +496,8 @@ namespace BillsyLiamGTA.Common.Minigames.Fingerprint
                 Thermite.Delete();
                 Thermite = null;
             }
+
+            PreviousBagType = BagManager.BagVariantType.Invalid;
 
             if (Bag != null && Bag.Exists())
             {

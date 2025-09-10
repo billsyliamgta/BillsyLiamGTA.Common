@@ -11,6 +11,8 @@ namespace BillsyLiamGTA.Common.Graphics.TimerBars
 
         public bool Dollars { get; set; } = false;
 
+        public Color NumberColor { get; set; } = Color.White;
+
         #endregion
 
         #region Constructor
@@ -28,7 +30,7 @@ namespace BillsyLiamGTA.Common.Graphics.TimerBars
         {
             base.Draw(y);
             y += TextOffset;
-            DrawInteger(Value, InitialX, y + 0.001f, 0, TextScale, Color.White, 2, TextWrap, false, false, Dollars);
+            DrawInteger(Value, InitialX, y + 0.001f, 0, TextScale, NumberColor, 2, TextWrap, false, false, Dollars);
         }
 
         #endregion

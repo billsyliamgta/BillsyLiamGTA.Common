@@ -11,6 +11,10 @@ namespace BillsyLiamGTA.Common.Scaleform
 
         public List<Dictionary<Control, string>> Pool { get; set; }
 
+        public bool MouseEnabled { get; set; } = true;
+
+        private bool ShouldUpdate { get; set; } = true;
+
         #endregion
 
         #region Constructor
@@ -33,6 +37,7 @@ namespace BillsyLiamGTA.Common.Scaleform
                 if (!Pool.Contains(button))
                 {
                     Pool.Add(button);
+                    ShouldUpdate = true;
                     return true;
                 }
             }
@@ -47,6 +52,7 @@ namespace BillsyLiamGTA.Common.Scaleform
                 if (Pool.Contains(button))
                 {
                     Pool.Remove(button);
+                    ShouldUpdate = true;
                     return true;
                 }
             }
@@ -56,21 +62,32 @@ namespace BillsyLiamGTA.Common.Scaleform
 
         public void Draw()
         {
-            CallFunction("CLEAR_ALL");
-            CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
-            CallFunction("CREATE_CONTAINER");
-            if (Pool != null)
+            if (ShouldUpdate)
             {
-                if (Pool.Count > 0)
+                CallFunction("CLEAR_ALL");
+                CallFunction("TOGGLE_MOUSE_BUTTONS", MouseEnabled ? 1 : 0);
+                // CallFunction("CREATE_CONTAINER");
+                if (Pool != null)
                 {
-                    for (int i = 0; i < Pool.Count; i++)
+                    if (Pool.Count > 0)
                     {
-                        var pair = Pool[i].First();
-                        CallFunction("SET_DATA_SLOT", i, Function.Call<string>(Hash.GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING, 0, (int)pair.Key, 0), pair.Value); 
+                        for (int i = 0; i < Pool.Count; i++)
+                        {
+                            var pair = Pool[i].First();
+                            if (MouseEnabled)
+                            {
+                                CallFunction("SET_DATA_SLOT", i, Function.Call<string>(Hash.GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING, 0, (int)pair.Key, 0), pair.Value, true, (int)pair.Key);
+                            }
+                            else
+                            {
+                                CallFunction("SET_DATA_SLOT", i, Function.Call<string>(Hash.GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING, 0, (int)pair.Key, 0), pair.Value);
+                            }
+                        }
                     }
                 }
+                CallFunction("DRAW_INSTRUCTIONAL_BUTTONS");
+                ShouldUpdate = false;
             }
-            CallFunction("DRAW_INSTRUCTIONAL_BUTTONS");
             DrawFullscreen();
         }
 
