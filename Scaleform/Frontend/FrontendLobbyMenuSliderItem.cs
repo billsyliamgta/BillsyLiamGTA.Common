@@ -11,7 +11,25 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public List<T> Items { get; set; }
 
-        public int CurrentSelection { get; set; } = 0;
+        public T Value
+        {
+            get
+            {
+                if (Items != null)
+                {
+                    if (Items.Count > 0 && Index >= 0 && Index < Items.Count)
+                    {
+                        return Items[Index];
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        public int Index { get; set; } = 0;
+
+        public FrontendMenuSliderItemValueChangedEventHandler<T> ValueChanged { get; set; }
 
         #endregion
 
@@ -20,7 +38,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
         public FrontendLobbyMenuSliderItem(string title, string description, List<T> list, int startingIndex = 0) : base(title, description)
         {
             Items = list;
-            CurrentSelection = startingIndex;
+            Index = startingIndex;
         }
 
         #endregion
@@ -30,7 +48,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
         public override void Add(int index)
         {
             base.Add(index);
-            CallFunctionFrontend("SET_DATA_SLOT", 0 /* columnId */, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[CurrentSelection].ToString(), 0, false);
+            CallFunctionFrontend("SET_DATA_SLOT", 0 /* columnId */, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[Index].ToString(), 0, false);
         }
 
         public override void Update(int index)
@@ -38,21 +56,22 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             base.Update(index);
             bool shouldUpdate = false;
 
-            if (Game.IsControlJustPressed(Control.FrontendRight) && CurrentSelection < Items.Count - 1)
+            if (Game.IsControlJustPressed(Control.FrontendRight) && Index < Items.Count - 1)
             {
-                CurrentSelection++;
+                Index++;
                 shouldUpdate = true;
             }
 
-            if (Game.IsControlJustPressed(Control.FrontendLeft) && CurrentSelection > 0)
+            if (Game.IsControlJustPressed(Control.FrontendLeft) && Index > 0)
             {
-                CurrentSelection--;
+                Index--;
                 shouldUpdate = true;
             }
 
             if (shouldUpdate)
             {
-                CallFunctionFrontend("UPDATE_SLOT", 0, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[CurrentSelection].ToString(), 0, false);
+                ValueChanged?.Invoke(this, new FrontendMenuSliderItemValueChangedArgs<T>(Value, Index, this));
+                CallFunctionFrontend("UPDATE_SLOT", 0, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[Index].ToString(), 0, false);
                 Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
             }
         }

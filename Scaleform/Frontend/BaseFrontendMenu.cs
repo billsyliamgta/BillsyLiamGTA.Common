@@ -32,9 +32,9 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             {
                 if (Items != null)
                 {
-                    if (Items.Count > 0 && CurrentSelection >= 0 && CurrentSelection < Items.Count)
+                    if (Items.Count > 0 && Selection >= 0 && Selection < Items.Count)
                     {
-                        return Items[CurrentSelection];
+                        return Items[Selection];
                     }
                 }
 
@@ -54,7 +54,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             get => Function.Call<bool>(Hash.IS_FRONTEND_READY_FOR_CONTROL);
         }
 
-        public int CurrentSelection { get; private set; } = 0;
+        public int Selection { get; private set; } = 0;
 
         public bool Inited { get; private set; } = false;
 
@@ -216,7 +216,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
                         InstructionalButtons?.Draw();
                         Function.Call(Hash.SET_SCRIPT_GFX_DRAW_BEHIND_PAUSEMENU, false);
 
-                        CurrentItem?.Update(CurrentSelection);
+                        CurrentItem?.Update(Selection);
 
                         bool updateDescription = false;
 
@@ -225,7 +225,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
                             int lastItemMenuId = 0;
                             int selectedItemUniqueId = 0;
                             Function.Call(Hash.GET_MENU_TRIGGER_EVENT_DETAILS, &lastItemMenuId, &selectedItemUniqueId);
-                            CurrentSelection = selectedItemUniqueId;
+                            Selection = selectedItemUniqueId;
                             if (Game.GameTime - FirstShowedGameTime > 500) // A short delay before any of the items can be activated.
                                 CurrentItem?.Activated?.Invoke(this, new FrontendMenuItemActivatedArgs(CurrentItem));
                             Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
@@ -238,9 +238,12 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
                             int selectedItemMenuId = 0;
                             int selectedItemUniqueId = 0;
                             Function.Call(Hash.GET_MENU_LAYOUT_CHANGED_EVENT_DETAILS, &lastItemMenuId, &selectedItemMenuId, &selectedItemUniqueId);
-                            CurrentSelection = selectedItemUniqueId;
+                            Selection = selectedItemUniqueId;
                             updateDescription = true;
                         }
+
+                        if (Game.IsControlJustPressed(Control.FrontendLeft) || Game.IsControlJustPressed(Control.FrontendRight))
+                            updateDescription = true;
 
                         if (updateDescription)
                             CallFunctionFrontend("SET_DESCRIPTION", 0, CurrentItem?.Description ?? string.Empty, true, false);
