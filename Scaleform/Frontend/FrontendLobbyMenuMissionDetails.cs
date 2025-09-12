@@ -16,6 +16,12 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public Dictionary<string, string> Texture { get; set; }
 
+        public int RP { get; set; } = 0;
+
+        public int Cash { get; set; } = 0;
+
+        public int AP { get; set; } = 0;
+
         #endregion
 
         #region Constructors
@@ -34,10 +40,8 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public void Show()
         {
-            CallFunctionFrontend("SET_DATA_SLOT", 1, 0, 0, 0, 0, 3, 0, "From", Developer, false, 0);
-            CallFunctionFrontend("SET_DATA_SLOT", 1, 1, 5, 5, 2, 3, 0, "Type", Type, false, 12);
             var texture = Texture.First();
-            CallFunctionFrontend("SET_COLUMN_TITLE", 1, "", Name, "", texture.Key, texture.Value, 1, 2, 0, 0, 0);
+            CallFunctionFrontend("SET_COLUMN_TITLE", 1, string.Empty, Name, string.Empty, texture.Key, texture.Value, 1, 2, RP, Cash, AP);
             CallFunctionFrontend("DISPLAY_DATA_SLOT", 1);
         }
 

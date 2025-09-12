@@ -70,13 +70,12 @@
     <Compile Include="Scaleform\CelebrationBackground.cs" />
     <Compile Include="Scaleform\CelebrationForeground.cs" />
     <Compile Include="Scaleform\CelebrationMain.cs" />
-    <Compile Include="Scaleform\Frontend\BaseFrontendMenu.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenu.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuMissionDetails.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuSliderItem.cs" />
     <Compile Include="Scaleform\Frontend\FrontendMenuHeading.cs" />
     <Compile Include="Scaleform\Frontend\FrontendMenuItemActivatedArgs.cs" />
     <Compile Include="Scaleform\Frontend\FrontendMenuItemActivatedEventHandler.cs" />
-    <Compile Include="Scaleform\Frontend\FrontendMenuLobby.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuItem.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuBaseItem.cs" />
     <Compile Include="Scaleform\Frontend\FrontendMenuSliderItemValueChangedArgs.cs" />

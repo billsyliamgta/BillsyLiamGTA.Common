@@ -4,9 +4,37 @@
     {
         #region Properties
 
-        public string Text { get; set; } = string.Empty;
+        private string _text = string.Empty;
 
-        public string Description { get; set; } = string.Empty;
+        public string Text
+        {
+            get
+            {
+                return _text;
+            }
+            set
+            {
+                _text = value;
+                PromptUpdate = true;
+            }
+        }
+
+        private string _description = string.Empty;
+
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                _description = value;
+                PromptUpdate = true;
+            }
+        }
+
+        public bool PromptUpdate { get; set; }
 
         public FrontendMenuItemActivatedEventHandler Activated { get; set; }
 
@@ -29,6 +57,10 @@
         }
 
         public virtual void Update(int index)
+        {
+        }
+
+        public virtual void Process(int index)
         {
         }
 

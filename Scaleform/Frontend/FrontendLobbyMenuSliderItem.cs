@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using GTA;
 using GTA.Native;
 using static BillsyLiamGTA.Common.Scaleform.BaseScaleform;
@@ -48,12 +49,17 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
         public override void Add(int index)
         {
             base.Add(index);
-            CallFunctionFrontend("SET_DATA_SLOT", 0 /* columnId */, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[Index].ToString(), 0, false);
+            CallFunctionFrontend("SET_DATA_SLOT", 0 /* columnId */, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, string.Empty, 0, Items[Index].ToString(), 0, false);
         }
 
         public override void Update(int index)
         {
             base.Update(index);
+            CallFunctionFrontend("UPDATE_SLOT", 0 /* columnId */, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, string.Empty, 0, Items[Index].ToString(), 0, false);
+        }
+
+        public override void Process(int index)
+        {
             bool shouldUpdate = false;
 
             if (Game.IsControlJustPressed(Control.FrontendRight) && Index < Items.Count - 1)
@@ -71,7 +77,7 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             if (shouldUpdate)
             {
                 ValueChanged?.Invoke(this, new FrontendMenuSliderItemValueChangedArgs<T>(Value, Index, this));
-                CallFunctionFrontend("UPDATE_SLOT", 0, index /* uniqueId */, 0, index /* uniqueId */, 0, 0, true, Text, "", 0, Items[Index].ToString(), 0, false);
+                Update(index);
                 Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
             }
         }

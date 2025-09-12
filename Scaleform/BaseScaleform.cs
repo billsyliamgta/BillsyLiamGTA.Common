@@ -32,22 +32,28 @@ namespace BillsyLiamGTA.Common.Scaleform
             }
         }
 
-        public static void CallFunctionFrontend(string function, params object[] args)
+        public static bool CallFunctionFrontend(string function, params object[] args)
         {
             if (Function.Call<bool>(Hash.BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND, function))
             {
                 PushArgsInternal(args);
                 Function.Call(Hash.END_SCALEFORM_MOVIE_METHOD);
+                return true;
             }
+
+            return false;
         }
 
-        public static void CallFunctionFrontendHeader(string function, params object[] args)
+        public static bool CallFunctionFrontendHeader(string function, params object[] args)
         {
             if (Function.Call<bool>(Hash.BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND_HEADER, function))
             {
                 PushArgsInternal(args);
                 Function.Call(Hash.END_SCALEFORM_MOVIE_METHOD);
+                return true;
             }
+
+            return false;
         }
 
         private static void PushArgsInternal(params object[] args)
