@@ -79,9 +79,14 @@ namespace BillsyLiamGTA.Common.Scaleform
                         break;
                     case string s:
                         {
-                            Function.Call(Hash.BEGIN_TEXT_COMMAND_SCALEFORM_STRING, "STRING");
-                            Function.Call(Hash.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME, s);
-                            Function.Call(Hash.END_TEXT_COMMAND_SCALEFORM_STRING);
+                            if (s.Length > 99)
+                                Function.Call(Hash.SCALEFORM_MOVIE_METHOD_ADD_PARAM_LITERAL_STRING, s);
+                            else
+                            {
+                                Function.Call(Hash.BEGIN_TEXT_COMMAND_SCALEFORM_STRING, "STRING");
+                                Function.Call(Hash.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME, s);
+                                Function.Call(Hash.END_TEXT_COMMAND_SCALEFORM_STRING);
+                            }
                         }
                         break;
                 }
