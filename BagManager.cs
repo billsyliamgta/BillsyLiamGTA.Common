@@ -155,7 +155,7 @@ namespace BillsyLiamGTA.Common
         {
             BagVariantType type = GetBagVariantTypeFromPed(ped);
             string bagModel = GetBagModelString(type);
-            Notification.PostTicker("Bag Variant Type: " + type.ToString() + " Bag Model: " + bagModel, true);
+            // Notification.PostTicker("Bag Variant Type: " + type.ToString() + " Bag Model: " + bagModel, true);
             return World.CreateProp(GetBagModelString(type), ped.Position, false, false);
         }
 

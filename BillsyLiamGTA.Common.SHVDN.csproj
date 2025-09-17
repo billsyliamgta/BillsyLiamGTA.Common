@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CC9B02FC-3D92-4D93-92C9-348BAB99AF92}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BillsyLiamGTA.Common</RootNamespace>
+    <AssemblyName>BillsyLiamGTA.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ScriptHookVDotNet3">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\ScriptHookVDotNet3.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\AudioScene.cs" />
+    <Compile Include="Audio\Sound.cs" />
+    <Compile Include="BagManager.cs" />
+    <Compile Include="CutsceneTools.cs" />
+    <Compile Include="Elements\BaseMission.cs" />
+    <Compile Include="Minigames\Artwork.cs" />
+    <Compile Include="Minigames\BaseMinigame.cs" />
+    <Compile Include="Minigames\Fingerprint\FingerprintMinigame.cs" />
+    <Compile Include="Minigames\Fingerprint\FingerprintScanner.cs" />
+    <Compile Include="Minigames\Lockbox.cs" />
+    <Compile Include="Minigames\MinigameValueAddedArgs.cs" />
+    <Compile Include="Minigames\MinigameValueAddedEventHandler.cs" />
+    <Compile Include="Ped\Enemy.cs" />
+    <Compile Include="Ped\EnemyHandler.cs" />
+    <Compile Include="Ped\SynchronizedScene.cs" />
+    <Compile Include="Player\PlayerManager.cs" />
+    <Compile Include="Player\PlayerSwitch.cs" />
+    <Compile Include="Respawn.cs" />
+    <Compile Include="Scaleform\BaseScaleform.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Minigames\TrollyGrab.cs" />
+    <Compile Include="Scaleform\Celebration.cs" />
+    <Compile Include="Scaleform\CelebrationBackground.cs" />
+    <Compile Include="Scaleform\CelebrationForeground.cs" />
+    <Compile Include="Scaleform\CelebrationMain.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenu.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuClosedArgs.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuClosedEventHandler.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuMissionDetails.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuSliderItem.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendMenuHeading.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendMenuItemActivatedArgs.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendMenuItemActivatedEventHandler.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuItem.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendLobbyMenuBaseItem.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendMenuSliderItemValueChangedArgs.cs" />
+    <Compile Include="Scaleform\Frontend\FrontendMenuSliderItemValueChangedEventHandler.cs" />
+    <Compile Include="Scaleform\HeistCelebration.cs" />
+    <Compile Include="Scaleform\HeistCelebrationBackground.cs" />
+    <Compile Include="Scaleform\HeistCelebrationForeground.cs" />
+    <Compile Include="Scaleform\HeistCelebrationMain.cs" />
+    <Compile Include="Scaleform\InstructionalButtons.cs" />
+    <Compile Include="TimerBars\BaseTimerBar.cs" />
+    <Compile Include="TimerBars\CountdownTimerBar.cs" />
+    <Compile Include="TimerBars\ProgressTimerBar.cs" />
+    <Compile Include="TimerBars\NumberTimerBar.cs" />
+    <Compile Include="TimerBars\TextTimerBar.cs" />
+    <Compile Include="TimerBars\TimerBarHelpers.cs" />
+    <Compile Include="TimerBars\TimerBarPool.cs" />
+    <Compile Include="Elements\VariableTimer.cs" />
+    <Compile Include="Weapon\WeaponData.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

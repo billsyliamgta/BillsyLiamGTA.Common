@@ -19,7 +19,7 @@ namespace BillsyLiamGTA.Common.Graphics.TimerBars
             }
             set
             {
-                _progress = Tools.Clamp(value, 0f, 1f);
+                _progress = BaseMission.Clamp(value, 0f, 1f);
             }
         }
 

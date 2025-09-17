@@ -1,4 +1,5 @@
-﻿using GTA;
+﻿using System;
+using GTA;
 using GTA.UI;
 using GTA.Math;
 using GTA.Native;
@@ -11,7 +12,7 @@ namespace BillsyLiamGTA.Common
 
         public static bool UseCustomPlayerSpawnPoint { get; private set; } = false;
 
-        public static Vector3 CustomSpawnPointPosition { get; private set; }
+        public static Vector3 CustomSpawnPointPosition { get; private set; } = Vector3.Zero;
 
         public static int ReturnWantedLevel = 0;
 
@@ -31,13 +32,13 @@ namespace BillsyLiamGTA.Common
             Aborted += OnAborted;
         }
 
-        private void OnTick(object sender, System.EventArgs e)
+        private void OnTick(object sender, EventArgs e)
         {
             if (GlobalVariable.Get(5).Read<int>() == 1)
                 DeathControl();
         }
 
-        private void OnAborted(object sender, System.EventArgs e)
+        private void OnAborted(object sender, EventArgs e)
         {
             if (GlobalVariable.Get(5).Read<int>() == 1)
                 SetRespawnStat(true);
@@ -81,7 +82,8 @@ namespace BillsyLiamGTA.Common
             {
                 GlobalVariable.Get(5).Write(0);
                 RequestScript("respawn_controller");
-                while (!HasScriptLoaded("respawn_controller")) Script.Wait(0);
+                while (!HasScriptLoaded("respawn_controller")) 
+                    Wait(0);
                 StartNewScript("respawn_controller", 128);
                 SetScriptAsNoLongerNeeded("respawn_controller");
                 DisableHospitalRestart(0, false);
@@ -119,11 +121,14 @@ namespace BillsyLiamGTA.Common
 
         public unsafe static void DeathControl()
         {
-            if (!Game.Player.Character.IsDead) return;
+            if (!Game.Player.Character.IsDead) 
+                return;
             int start = Game.GameTime;
             bool flag = false;
-            if (Screen.IsHelpTextDisplayed) Screen.ClearHelpText();
-            while (!Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "OFFMISSION_WASTED", false, -1)) Wait(0);
+            if (Screen.IsHelpTextDisplayed) 
+                Screen.ClearHelpText();
+            while (!Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "OFFMISSION_WASTED", false, -1)) 
+                Wait(0);
             Function.Call(Hash.START_AUDIO_SCENE, "DEATH_SCENE");
             GTA.Scaleform scaleform = GTA.Scaleform.RequestMovie("MP_BIG_MESSAGE_FREEMODE");
             Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "MP_Flash", "WastedSounds", true);
@@ -151,17 +156,17 @@ namespace BillsyLiamGTA.Common
             SetClockTime(ReturnHour, ReturnMinute, ReturnSecond);
             Function.Call(Hash.ANIMPOSTFX_STOP_ALL);
             Function.Call(Hash.CLEAR_TIMECYCLE_MODIFIER);
-            if (GameplayCamera.IsShaking) GameplayCamera.StopShaking();
+            if (GameplayCamera.IsShaking) 
+                GameplayCamera.StopShaking();
             Vector3 position = Vector3.Zero;
             if (UseCustomPlayerSpawnPoint)
-            {
                 position = CustomSpawnPointPosition;
-            }
             else
             {
                 position = Game.Player.Character.Position;
                 int interiorFlag = 2;
-                if (Function.Call<int>(Hash.GET_INTERIOR_FROM_ENTITY, Game.Player.Character) != 0) interiorFlag = 1;
+                if (Function.Call<int>(Hash.GET_INTERIOR_FROM_ENTITY, Game.Player.Character) != 0) 
+                    interiorFlag = 1;
                 Function.Call(Hash.SPAWNPOINTS_START_SEARCH, position.X, position.Y, position.Z, 150f, 5f, 0x18 | interiorFlag | 0x20, -1f, 20000);
                 int spawnPoints = Function.Call<int>(Hash.SPAWNPOINTS_GET_NUM_SEARCH_RESULTS);
                 Function.Call(Hash.SPAWNPOINTS_GET_SEARCH_RESULT, Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, 0, spawnPoints), &position.X, &position.Y, &position.Z);

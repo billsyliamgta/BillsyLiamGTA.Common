@@ -10,7 +10,9 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public string Name { get; set; } = string.Empty;
 
-        public string Developer { get; set; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+
+        public int MaxPlayers { get; set; } = 1;
 
         public string Type { get; set; } = string.Empty;
 
@@ -26,10 +28,11 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         #region Constructors
         
-        public FrontendLobbyMenuMissionDetails(string name, string developer, string type, Dictionary<string, string> texture)
+        public FrontendLobbyMenuMissionDetails(string name, string from, int maxPlayers, string type, Dictionary<string, string> texture)
         {
             Name = name;
-            Developer = developer;
+            From = from;
+            MaxPlayers = maxPlayers;
             Type = type;
             Texture = texture;
         }
@@ -40,8 +43,19 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public void Show()
         {
-            var texture = Texture.First();
-            CallFunctionFrontend("SET_COLUMN_TITLE", 1, string.Empty, Name, string.Empty, texture.Key, texture.Value, 1, 2, RP, Cash, AP);
+            string textureDictionary = string.Empty;
+            string textureName = string.Empty;
+            if (Texture != null)
+            {
+                var texture = Texture.First();
+                textureDictionary = texture.Key;
+                textureName = texture.Value;
+            }
+
+            CallFunctionFrontend("SET_DATA_SLOT", 1, 0, 0, 0, 0, 3, 0, "From", From, false, 0);
+            CallFunctionFrontend("SET_DATA_SLOT", 1, 1, 0, 0, 0, 3, 0, "Players", $"1-{MaxPlayers}", false, 0);
+            CallFunctionFrontend("SET_DATA_SLOT", 1, 2, 5, 5, 2, 3, 0, "Type", Type, false, 12);
+            CallFunctionFrontend("SET_COLUMN_TITLE", 1, string.Empty, Name, string.Empty, textureDictionary, textureName, 1, 2, RP, Cash, AP);
             CallFunctionFrontend("DISPLAY_DATA_SLOT", 1);
         }
 

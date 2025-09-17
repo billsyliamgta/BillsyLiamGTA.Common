@@ -2,7 +2,6 @@
 using GTA.Native;
 using System;
 using System.Collections.Generic;
-using System.Security;
 
 namespace BillsyLiamGTA.Common.Scaleform
 {
@@ -30,6 +29,14 @@ namespace BillsyLiamGTA.Common.Scaleform
 
         public HeistCelebrationForeground Foreground;
 
+        public enum BigDollarStepSoundType
+        {
+            TakeAppear = 3,
+            ActualTakeAppear = 4,
+            CutOfTakeAppear = 5,
+            EliteChallengeAppear = 6,
+        }
+
         public struct BigDollarsStep
         {
             public int Value;
@@ -38,13 +45,18 @@ namespace BillsyLiamGTA.Common.Scaleform
 
             public string BottomText;
 
-            public BigDollarsStep(int value, string topText, string bottomText)
+            public BigDollarStepSoundType SoundType;
+
+            public BigDollarsStep(int value, string topText, string bottomText, BigDollarStepSoundType soundType)
             {
                 Value = value;
                 TopText = topText;
                 BottomText = bottomText;
+                SoundType = soundType;
             }
         }
+
+        public bool HasMoneyMesh { get; set; } = true;
 
         #endregion
 
@@ -121,14 +133,14 @@ namespace BillsyLiamGTA.Common.Scaleform
                     {
                         previousValue = bigDollarsSteps[totalBigDollarSteps - 1].Value;
                     }
-                    CallFunctionAll("ADD_INCREMENTAL_CASH_WON_STEP", WallId, "SUMMARY", previousValue, bigDollarsSteps[totalBigDollarSteps].Value, bigDollarsSteps[totalBigDollarSteps].TopText, bigDollarsSteps[totalBigDollarSteps].BottomText, "", "", 7);
+                    CallFunctionAll("ADD_INCREMENTAL_CASH_WON_STEP", WallId, "SUMMARY", previousValue, bigDollarsSteps[totalBigDollarSteps].Value, bigDollarsSteps[totalBigDollarSteps].TopText, bigDollarsSteps[totalBigDollarSteps].BottomText, "", 3, (int)bigDollarsSteps[totalBigDollarSteps].SoundType);
                 }
                 CallFunctionAll("ADD_INCREMENTAL_CASH_ANIMATION_TO_WAL", WallId, "SUMMARY");
             }
 
             #endregion
 
-            CallFunctionAll("ADD_BACKGROUND_TO_WALL", WallId, BackgroundAlpha, 1);
+            CallFunctionAll("ADD_BACKGROUND_TO_WALL", WallId, BackgroundAlpha, HasMoneyMesh);
             CallFunctionAll("SHOW_STAT_WALL", WallId);
             int start = Game.GameTime;
             while (Game.GameTime - start < (Transition * 2) + (duration * 1000) + (totalBigDollarSteps * 500))
@@ -136,6 +148,7 @@ namespace BillsyLiamGTA.Common.Scaleform
                 Game.DisableControlThisFrame(Control.FrontendPause);
                 Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
                 Function.Call(Hash.HIDE_HUD_AND_RADAR_THIS_FRAME);
+                Function.Call(Hash.THEFEED_HIDE_THIS_FRAME);
                 DrawAll();
                 Script.Wait(0);
             }
