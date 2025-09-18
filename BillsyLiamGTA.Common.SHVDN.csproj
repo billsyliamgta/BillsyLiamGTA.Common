@@ -7,8 +7,8 @@
     <ProjectGuid>{CC9B02FC-3D92-4D93-92C9-348BAB99AF92}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BillsyLiamGTA.Common</RootNamespace>
-    <AssemblyName>BillsyLiamGTA.Common</AssemblyName>
+    <RootNamespace>BillsyLiamGTA.Common.SHVDN</RootNamespace>
+    <AssemblyName>BillsyLiamGTA.Common.SHVDN</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -50,7 +50,7 @@
     <Compile Include="Audio\Sound.cs" />
     <Compile Include="BagManager.cs" />
     <Compile Include="CutsceneTools.cs" />
-    <Compile Include="Elements\BaseMission.cs" />
+    <Compile Include="Elements\BaseScript.cs" />
     <Compile Include="Minigames\Artwork.cs" />
     <Compile Include="Minigames\BaseMinigame.cs" />
     <Compile Include="Minigames\Fingerprint\FingerprintMinigame.cs" />

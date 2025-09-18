@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using GTA;
 using GTA.UI;
 using GTA.Native;
-using static BillsyLiamGTA.Common.Graphics.TimerBars.TimerBarHelpers;
+using static BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars.TimerBarHelpers;
 
-namespace BillsyLiamGTA.Common.Graphics.TimerBars
+namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public class TimerBarPool : Script
     {

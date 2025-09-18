@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using GTA;
 using GTA.Native;
-using BillsyLiamGTA.Common.Weapon;
+using BillsyLiamGTA.Common.SHVDN.Weapon;
+using BillsyLiamGTA.Common.SHVDN.Graphics;
 
-namespace BillsyLiamGTA.Common.Player
+namespace BillsyLiamGTA.Common.SHVDN.Player
 {
     public class PlayerManager
     {

@@ -1,4 +1,4 @@
-﻿namespace BillsyLiamGTA.Common.Graphics.TimerBars
+﻿namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public class TextTimerBar : BaseTimerBar
     {

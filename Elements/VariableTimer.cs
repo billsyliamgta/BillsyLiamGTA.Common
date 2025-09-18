@@ -1,6 +1,6 @@
 ﻿using GTA;
 
-namespace BillsyLiamGTA.Common.Elements
+namespace BillsyLiamGTA.Common.SHVDN.Elements
 {
     public class VariableTimer
     {

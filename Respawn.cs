@@ -4,7 +4,7 @@ using GTA.UI;
 using GTA.Math;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common
+namespace BillsyLiamGTA.Common.SHVDN
 {
     public class Respawn : Script
     {

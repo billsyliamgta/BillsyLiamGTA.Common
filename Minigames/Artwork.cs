@@ -1,11 +1,11 @@
 ﻿using System;
 using GTA;
+using GTA.UI;
 using GTA.Math;
 using GTA.Native;
-using BillsyLiamGTA.Common.Ped;
-using GTA.UI;
+using BillsyLiamGTA.Common.SHVDN.Ped;
 
-namespace BillsyLiamGTA.Common.Minigames
+namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
     public class Artwork : BaseMinigame
     {

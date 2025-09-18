@@ -1,4 +1,4 @@
-﻿namespace BillsyLiamGTA.Common.Scaleform
+﻿namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
     /// <summary>
     /// The background of the Heist Celebration scaleform.

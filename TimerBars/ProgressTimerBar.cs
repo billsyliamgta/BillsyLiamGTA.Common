@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
 using GTA.Native;
-using BillsyLiamGTA.Common.Elements;
-using static BillsyLiamGTA.Common.Graphics.TimerBars.TimerBarHelpers;
+using BillsyLiamGTA.Common.SHVDN.Elements;
+using static BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars.TimerBarHelpers;
 
-namespace BillsyLiamGTA.Common.Graphics.TimerBars
+namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public class ProgressTimerBar : BaseTimerBar
     {
@@ -19,7 +19,7 @@ namespace BillsyLiamGTA.Common.Graphics.TimerBars
             }
             set
             {
-                _progress = BaseMission.Clamp(value, 0f, 1f);
+                _progress = BaseScript.Clamp(value, 0f, 1f);
             }
         }
 

@@ -3,7 +3,7 @@ using GTA;
 using GTA.Native;
 using Ped = GTA.Ped;
 
-namespace BillsyLiamGTA.Common
+namespace BillsyLiamGTA.Common.SHVDN
 {
     public class CutsceneTools
     {

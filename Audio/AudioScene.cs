@@ -1,6 +1,6 @@
 ﻿using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Audio
+namespace BillsyLiamGTA.Common.SHVDN.Audio
 {
     public class AudioScene
     {

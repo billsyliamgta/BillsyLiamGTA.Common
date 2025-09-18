@@ -3,10 +3,10 @@ using GTA;
 using GTA.UI;
 using GTA.Math;
 using GTA.Native;
-using BillsyLiamGTA.Common.Ped;
-using BillsyLiamGTA.Common.Audio;
+using BillsyLiamGTA.Common.SHVDN.Ped;
+using BillsyLiamGTA.Common.SHVDN.Audio;
 
-namespace BillsyLiamGTA.Common.Minigames
+namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
     public class TrollyGrab : BaseMinigame
     {

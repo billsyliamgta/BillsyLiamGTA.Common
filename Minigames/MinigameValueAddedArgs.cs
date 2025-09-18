@@ -1,6 +1,6 @@
 ﻿using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Minigames
+namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
     /// <summary>
     /// Represents the arguments of a minigame value being added.

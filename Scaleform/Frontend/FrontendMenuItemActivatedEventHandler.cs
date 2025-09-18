@@ -1,4 +1,4 @@
-﻿namespace BillsyLiamGTA.Common.Scaleform.Frontend
+﻿namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
 {
     public delegate void FrontendMenuItemActivatedEventHandler(object sender, FrontendMenuItemActivatedArgs e);
 }

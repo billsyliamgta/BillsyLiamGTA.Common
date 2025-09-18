@@ -1,6 +1,6 @@
 ﻿using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Player
+namespace BillsyLiamGTA.Common.SHVDN.Player
 {
     /// <summary>
     /// A enum containing the different types of player switching.

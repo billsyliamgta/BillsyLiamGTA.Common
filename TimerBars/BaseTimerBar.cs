@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
 using GTA.Native;
-using static BillsyLiamGTA.Common.Graphics.TimerBars.TimerBarHelpers;
+using static BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars.TimerBarHelpers;
 
-namespace BillsyLiamGTA.Common.Graphics.TimerBars
+namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public abstract class BaseTimerBar
     {

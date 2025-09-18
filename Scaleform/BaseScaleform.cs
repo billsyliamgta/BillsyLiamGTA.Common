@@ -1,8 +1,8 @@
-﻿using GTA;
+﻿using System;
+using GTA;
 using GTA.Native;
-using System;
 
-namespace BillsyLiamGTA.Common.Scaleform
+namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
     public abstract class BaseScaleform
     {

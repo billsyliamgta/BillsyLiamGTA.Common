@@ -1,7 +1,7 @@
 ﻿using GTA;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Minigames
+namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
     public abstract class BaseMinigame
     {

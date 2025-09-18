@@ -3,7 +3,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Ped
+namespace BillsyLiamGTA.Common.SHVDN.Ped
 {
     /// <summary>
     /// A class for creating and managing synchronized scenes.

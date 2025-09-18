@@ -1,9 +1,9 @@
 ﻿using System;
 using GTA;
-using BillsyLiamGTA.Common.Elements;
-using static BillsyLiamGTA.Common.Graphics.TimerBars.TimerBarHelpers;
+using BillsyLiamGTA.Common.SHVDN.Elements;
+using static BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars.TimerBarHelpers;
 
-namespace BillsyLiamGTA.Common.Graphics.TimerBars
+namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public class CountdownTimerBar : BaseTimerBar
     {

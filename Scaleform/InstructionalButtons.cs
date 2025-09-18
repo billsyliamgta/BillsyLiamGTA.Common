@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using GTA;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Scaleform
+namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
     public class InstructionalButtons : BaseScaleform
     {

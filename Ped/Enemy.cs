@@ -1,7 +1,7 @@
 ﻿using GTA;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Ped
+namespace BillsyLiamGTA.Common.SHVDN.Ped
 {
     public class Enemy
     {

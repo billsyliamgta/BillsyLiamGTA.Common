@@ -2,9 +2,9 @@
 using GTA.UI;
 using GTA.Math;
 using GTA.Native;
-using BillsyLiamGTA.Common.Ped;
+using BillsyLiamGTA.Common.SHVDN.Ped;
 
-namespace BillsyLiamGTA.Common.Minigames.Fingerprint
+namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 {
     public enum FingerprintScannerType
     {

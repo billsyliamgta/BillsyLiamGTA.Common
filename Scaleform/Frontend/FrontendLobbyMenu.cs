@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using GTA;
 using GTA.Native;
-using BillsyLiamGTA.Common.Elements;
-using static BillsyLiamGTA.Common.Scaleform.BaseScaleform;
+using BillsyLiamGTA.Common.SHVDN.Elements;
+using static BillsyLiamGTA.Common.SHVDN.Scaleform.BaseScaleform;
 
 
-namespace BillsyLiamGTA.Common.Scaleform.Frontend
+namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
 {
     public class FrontendLobbyMenu
     {
@@ -34,8 +34,14 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         public InstructionalButtons InstructionalButtons { get; private set; }
 
+        /// <summary>
+        /// A list containing the menu's items.
+        /// </summary>
         public List<FrontendLobbyMenuBaseItem> Items {  get; private set; }
 
+        /// <summary>
+        /// Return's the current selected item, or null if there are no items.
+        /// </summary>
         public FrontendLobbyMenuBaseItem CurrentItem
         {
             get
@@ -52,13 +58,22 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             }
         }
 
+        /// <summary>
+        /// Gets or sets the mission details for the menu.
+        /// </summary>
         public FrontendLobbyMenuMissionDetails MissionDetails { get; set; } = null;
 
+        /// <summary>
+        /// Whether the frontend menu is active.
+        /// </summary>
         public bool IsActive
         {
-            get => Function.Call<int>(Hash.GET_CURRENT_FRONTEND_MENU_VERSION) == BaseMission.GetHashKey(MenuHash);
+            get => Function.Call<int>(Hash.GET_CURRENT_FRONTEND_MENU_VERSION) == BaseScript.GetHashKey(MenuHash);
         }
 
+        /// <summary>
+        /// Whether or not the frontend is ready for control.
+        /// </summary>
         public bool IsReadyForControl
         {
             get => Function.Call<bool>(Hash.IS_FRONTEND_READY_FOR_CONTROL);
@@ -119,14 +134,31 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
 
         #region Functions
 
+        /// <summary>
+        /// Take's control of the frontend.
+        /// </summary>
         private void TakeControl() => Function.Call(Hash.TAKE_CONTROL_OF_FRONTEND);
 
+        /// <summary>
+        /// Release's control of the frontend.
+        /// </summary>
         private void ReleaseControl() => Function.Call(Hash.RELEASE_CONTROL_OF_FRONTEND);
 
-        private void Activate() => Function.Call(Hash.ACTIVATE_FRONTEND_MENU, BaseMission.GetHashKey(MenuHash), false, -1);
+        /// <summary>
+        /// Activates the menu.
+        /// </summary>
+        private void Activate() => Function.Call(Hash.ACTIVATE_FRONTEND_MENU, BaseScript.GetHashKey(MenuHash), false, -1);
 
-        private void Restart() => Function.Call(Hash.RESTART_FRONTEND_MENU, BaseMission.GetHashKey(MenuHash), -1);
+        /// <summary>
+        /// Restarts the menu.
+        /// </summary>
+        private void Restart() => Function.Call(Hash.RESTART_FRONTEND_MENU, BaseScript.GetHashKey(MenuHash), -1);
 
+        /// <summary>
+        /// Adds a heading to the menu, if it doesn't already exist.
+        /// </summary>
+        /// <param name="heading"></param>
+        /// <returns></returns>
         public bool AddHeading(FrontendMenuHeading heading)
         {
             if (Headings != null && !Headings.Contains(heading))
@@ -138,6 +170,11 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             return false;
         }
 
+        /// <summary>
+        /// Removes a heading from the menu, if it exists.
+        /// </summary>
+        /// <param name="heading"></param>
+        /// <returns></returns>
         public bool RemoveHeading(FrontendMenuHeading heading)
         {
             if (Headings != null && Headings.Contains(heading))
@@ -149,6 +186,11 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             return false;
         }
 
+        /// <summary>
+        /// Adds a item to the menu, if it doesn't already exist.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool AddItem(FrontendLobbyMenuBaseItem item)
         {
             if (Items != null && !Items.Contains(item))
@@ -160,6 +202,11 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             return false;
         }
 
+        /// <summary>
+        /// Removes a item from the menu, if it exists.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool RemoveItem(FrontendLobbyMenuBaseItem item)
         {
             if (Items != null && Items.Contains(item))
@@ -171,6 +218,9 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             return false;
         }
 
+        /// <summary>
+        /// Shows the menu. Keep in mind, you will need to run <see cref="Process"/> for this to work properly.
+        /// </summary>
         public void Show()
         {
             InstructionalButtons?.Load();
@@ -181,7 +231,11 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
             }
         }
 
-        public void Release()
+        /// <summary>
+        /// Releases the menu.
+        /// </summary>
+        /// <param name="invokeClosedEvent"></param>
+        public void Release(bool invokeClosedEvent = true)
         {
             InstructionalButtons?.Dispose();          
             if (IsActive)
@@ -191,9 +245,13 @@ namespace BillsyLiamGTA.Common.Scaleform.Frontend
                 Activate();
             }
             Inited = false;
-            Closed?.Invoke(this, new FrontendLobbyMenuClosedArgs(this));
+            if (invokeClosedEvent)
+                Closed?.Invoke(this, new FrontendLobbyMenuClosedArgs(this));
         }
 
+        /// <summary>
+        /// Processes the menu and keeps track of input. This should be called every tick.
+        /// </summary>
         public virtual unsafe void Process()
         {
             if (Function.Call<bool>(Hash.IS_PAUSE_MENU_ACTIVE) && !Function.Call<bool>(Hash.IS_PAUSE_MENU_RESTARTING))

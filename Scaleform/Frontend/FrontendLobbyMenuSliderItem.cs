@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using GTA;
 using GTA.Native;
-using static BillsyLiamGTA.Common.Scaleform.BaseScaleform;
+using static BillsyLiamGTA.Common.SHVDN.Scaleform.BaseScaleform;
 
-namespace BillsyLiamGTA.Common.Scaleform.Frontend
+namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
 {
     public class FrontendLobbyMenuSliderItem<T> : FrontendLobbyMenuBaseItem
     {

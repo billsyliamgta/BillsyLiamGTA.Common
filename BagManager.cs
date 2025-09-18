@@ -1,10 +1,9 @@
 ﻿using GTA;
-using GTA.UI;
 using GTA.Native;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace BillsyLiamGTA.Common
+namespace BillsyLiamGTA.Common.SHVDN
 {
     public class BagManager
     {

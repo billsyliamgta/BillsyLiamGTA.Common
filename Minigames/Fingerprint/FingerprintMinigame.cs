@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using GTA;
 using GTA.Native;
 using static GTA.Game;
-using BaseScaleform = BillsyLiamGTA.Common.Scaleform.BaseScaleform;
-using BillsyLiamGTA.Common.Audio;
-using BillsyLiamGTA.Common.Graphics.TimerBars;
-using BillsyLiamGTA.Common.Scaleform;
-using GTA.UI;
+using BaseScaleform = BillsyLiamGTA.Common.SHVDN.Scaleform.BaseScaleform;
+using BillsyLiamGTA.Common.SHVDN.Audio;
+using BillsyLiamGTA.Common.SHVDN.Scaleform;
+using BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars;
 
-namespace BillsyLiamGTA.Common.Minigames.Fingerprint
+namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 {
     public class FingerprintMinigame
     {

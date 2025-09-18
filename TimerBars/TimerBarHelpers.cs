@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using GTA.Native;
 
-namespace BillsyLiamGTA.Common.Graphics.TimerBars
+namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 {
     public static class TimerBarHelpers
     {

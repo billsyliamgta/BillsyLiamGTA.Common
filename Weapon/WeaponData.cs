@@ -2,7 +2,7 @@
 using GTA.Native;
 using System.Collections.Generic;
 
-namespace BillsyLiamGTA.Common.Weapon
+namespace BillsyLiamGTA.Common.SHVDN.Weapon
 {
     /// <summary>
     /// A class for getting and setting weapon data for loadouts.

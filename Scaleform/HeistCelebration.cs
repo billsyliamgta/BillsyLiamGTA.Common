@@ -3,7 +3,7 @@ using GTA.Native;
 using System;
 using System.Collections.Generic;
 
-namespace BillsyLiamGTA.Common.Scaleform
+namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
     public class HeistCelebration
     {
