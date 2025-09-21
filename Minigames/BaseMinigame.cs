@@ -28,19 +28,15 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
 
         public bool NativeInProgress
         {
-            get
-            {
-                return Function.Call<bool>(Hash.IS_MINIGAME_IN_PROGRESS);
-            }
-            set
-            {
-                Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, value);
-            }
+            get => Function.Call<bool>(Hash.IS_MINIGAME_IN_PROGRESS);
+            set => Function.Call(Hash.SET_MINIGAME_IN_PROGRESS, value);
         }
 
         public bool ScriptIsInProgress { get; set; } = false;
 
         public bool IsLooted { get; set; } = false;
+
+        public bool EnableCasinoBlackjackCamera { get; set; } = false;
 
         public MinigameValueAddedEventHandler ValueAdded { get; set; }
 
@@ -156,11 +152,22 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             ScriptIsInProgress = toggle;
         }
 
+        /// <summary>
+        /// A virtual method that updates the minigame.
+        /// </summary>
         public virtual unsafe void Update()
         {
-            if (Game.Player.Character.IsDead && ScriptIsInProgress) PushDeathResetFunction();
+            if (EnableCasinoBlackjackCamera)
+            {
+                Function.Call(Hash.INVALIDATE_IDLE_CAM);
+                Function.Call((Hash)0x79C0E43EB9B944E2, Function.Call<Hash>(Hash.GET_HASH_KEY, "CASINO_BLACKJACK_CAMERA"));
+            }
 
-            fixed (MinigameStruct* pData = &Data) func_7677(pData, MinRate, MaxRate);
+            if (Game.Player.Character.IsDead && ScriptIsInProgress) 
+                PushDeathResetFunction();
+
+            fixed (MinigameStruct* pData = &Data) 
+                func_7677(pData, MinRate, MaxRate);
         }
 
         /// <summary>

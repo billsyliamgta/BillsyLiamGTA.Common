@@ -13,6 +13,29 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 {
     public class FingerprintMinigame
     {
+        #region Fields
+
+        readonly string[] TextureDicts = new[]
+        {
+            "MPFClone_Common",
+            "MPFClone_Decor",
+            "MPFClone_GridDetails",
+            "MPFClone_Grid",
+            "MPFClone_Print0",
+            "MPFClone_Print1",
+            "MPFClone_Print2",
+            "MPFClone_Print3",
+            "mphackinggame",
+            "mphackinggamebg",
+            "mphackinggamewin",
+            "mphackinggamewin2",
+            "mphackinggamewin3",
+            "mphackinggameoverlay",
+            "mphackinggameoverlay1"
+        };
+
+        #endregion
+
         #region Properties
 
         public enum FingerprintMinigameState
@@ -456,9 +479,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
         private void ShufflePrints()
         {
             if (ShuffledPrints?.Count > 0)
-            {
                 ShuffledPrints.Clear();
-            }
 
             ShuffledPrints = Enumerable.Range(0, 8).ToList();
             Random rng = new Random();
@@ -484,6 +505,49 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
             return true;
         }
 
+        /// <summary>
+        /// Request's the streamed texture dicts and returns true if they are all loaded.
+        /// </summary>
+        /// <returns></returns>
+        private bool LoadStreamedTextureDicts()
+        {
+            foreach (var dict in TextureDicts)
+                Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, dict, false);
+
+            return TextureDicts.All(dict =>
+                Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, dict));
+        }
+
+        /// <summary>
+        /// Unload's the streamed texture dicts.
+        /// </summary>
+        private void UnloadStreamedTextureDicts()
+        {
+            foreach (var dict in TextureDicts)
+                Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, dict);
+        }
+
+        /// <summary>
+        /// Request's the script audio banks and returns true if they are all loaded.
+        /// </summary>
+        /// <returns></returns>
+        private bool RequestScriptAudioBanks()
+        {
+            if (Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match", false, -1) && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking", false, -1))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Release's the script audio banks.
+        /// </summary>
+        private void ReleaseScriptAudioBanks()
+        {
+            Function.Call(Hash.RELEASE_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match");
+            Function.Call(Hash.RELEASE_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking");
+        }
+
         public unsafe void Update()
         {
             DisableControls(Index > 0);
@@ -491,38 +555,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
             {
                 case 0:
                     {
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Common", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Decor", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_GridDetails", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Grid", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Print0", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Print1", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Print2", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "MPFClone_Print3", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggame", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggamebg", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggamewin", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggamewin2", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggamewin3", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggameoverlay", false);
-                        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "mphackinggameoverlay1", false);
-                        if (Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Common") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Decor") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_GridDetails") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Grid") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Print0") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Print1") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Print2") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "MPFClone_Print3") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggame") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamebg") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamewin") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamewin2") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggamewin3") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggameoverlay") &&
-    Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "mphackinggameoverlay1") &&
-    Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match", false, -1) && 
-    Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking", false, -1))
+                        if (LoadStreamedTextureDicts() && RequestScriptAudioBanks())
                         {
                             InstructionalButtons = new InstructionalButtons();
                             InstructionalButtons.Load();                           
@@ -603,20 +636,15 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                         {
                             bool processing = IsProcessing;
                             bool scrambling = IsScrambling;
-                            Function.Call(Hash.SET_SCRIPT_GFX_DRAW_ORDER, 4);
 
                             func_14091("mphackinggamebg", "bg", 0.5f, 0.5f, 1920f, 1080f, 0f, 255, 255, 255, 255, false);
 
                             if (GameTime - UpdateTechSetGameTime > 250)
                             {
                                 if (TechSet == 4)
-                                {
                                     TechSet = 0;
-                                }
                                 else
-                                {
                                     TechSet++;
-                                }
                                 UpdateTechSetGameTime = GameTime;
                             }
 
@@ -627,20 +655,14 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                             func_14091("mphackinggame", "Black_BG", 0.5f, 0.5f, 1920f, 1080f, 0f, 5, 5, 5, 100, false);
                             func_14091("MPFClone_Common", "background_layout", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
                             func_14091("mphackinggameoverlay", "grid_rgb_pixels", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
-                            func_14091("mphackinggameoverlay1", "ScreenGrid", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);
-
-                            
+                            func_14091("mphackinggameoverlay1", "ScreenGrid", 0.5f, 0.5f, 1264f, 940f, 0f, 255, 255, 255, 255, false);                          
 
                             if (GameTime - UpdateDiscSetGameTime > 500)
                             {
                                 if (DiscSet == 2)
-                                {
                                     DiscSet = 0;
-                                }
                                 else
-                                {
                                     DiscSet++;
-                                }
                                 UpdateDiscSetGameTime = GameTime;
                             }
 
@@ -686,15 +708,11 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                         targetFgAlpha[i] = Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, 127, 255);
 
                                         if (i == 7)
-                                        {
                                             UpdateProcessFgGameTime = GameTime;
-                                        }
                                     }
                                 }
                                 else
-                                {
                                     targetFgAlpha[i] = 127;
-                                }
 
                                 func_14091($"MPFClone_Print{TargetPrint - 1}", $"fp{TargetPrint}_{i + 1}", 0.674f, 0.379f, 400f, 512f, 0f, 255, 255, 255, targetFgAlpha[i], false);
                                 float fpX = 0f;
@@ -737,9 +755,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                             }
 
                                             if (i == 7)
-                                            {
                                                 ScramblerLastShuffledGameTime = GameTime;
-                                            }
                                         }
                                     }
                                 }
@@ -747,9 +763,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                 {
                                     fpCompAlpha[i] = 127;
                                     if (SelectedPrints.Contains(i))
-                                    {
                                         fpCompAlpha[i] = 255;
-                                    }
                                     fpCompTextureName[i] = $"fp{TargetPrint}_comp_{ShuffledPrints[i] + 1}";
                                 }
                                 func_14091($"MPFClone_Print{TargetPrint - 1}", fpCompTextureName[i], fpX, fpY, 128f, 128f, 0f, 255, 255, 255, fpCompAlpha[i], false);
@@ -760,13 +774,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                 if (GameTime - UpdateGridNoiseSetGameTime > 250)
                                 {
                                     if (GridNoiseSet == 2)
-                                    {
                                         GridNoiseSet = 0;
-                                    }
                                     else
-                                    {
                                         GridNoiseSet++;
-                                    }
                                     UpdateGridNoiseSetGameTime = GameTime;
                                 }
 
@@ -782,13 +792,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                             if (GameTime - UpdateGridDetailsSetGameTime > 500)
                             {
                                 if (GridDetailsSet == 3)
-                                {
                                     GridDetailsSet = 0;
-                                }
                                 else
-                                {
                                     GridDetailsSet++;
-                                }
                                 UpdateGridDetailsSetGameTime = GameTime;
                             }
 
@@ -796,19 +802,13 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                             float selectorY = 0f;
                             func_14175(Selection, &selectorX, &selectorY);
                             if (!scrambling)
-                            {
                                 func_14091("MPFClone_Common", "selectorFrame", selectorX, selectorY, 180f, 180f, 0f, 255, 255, 255, 255, false);
-                            }
                             for (int i = 0; i <= 4; i++)
                             {
                                 if (i <= PrintsToHack)
-                                {
                                     func_14091("MPFClone_Common", $"Decypher_{i + 1}", func_14172(i + 1), 0.832f, 128f, 128f, 0f, 255, 255, 255, 255, false);
-                                }
                                 else
-                                {
                                     func_14091("MPFClone_Common", "Disabled_Signal", func_14172(i), 0.832f, 128f, 128f, 0f, 255, 255, 255, 255, false);
-                                }
                             }
                             func_14091("MPFClone_Common", "Decyphered_Selector", func_14172(TargetPrint), 0.832f, 180f, 180f, 0f, 255, 255, 255, 255, false);
 
@@ -886,9 +886,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                             else
                                             {
                                                 if (Lives > 0)
-                                                {
                                                     Lives--;
-                                                }
                                             }
 
                                             IsProcessing = false;
@@ -995,7 +993,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
             InstructionalButtons?.Dispose();
             InstructionalButtons = null;
             TimerBarPool.ShouldMoveUp = false;
-            if (AudioScene.IsActive("DLC_H3_Fingerprint_Hack_Scene")) AudioScene.Stop("DLC_H3_Fingerprint_Hack_Scene");
+            if (AudioScene.IsActive("DLC_H3_Fingerprint_Hack_Scene"))
+                AudioScene.Stop("DLC_H3_Fingerprint_Hack_Scene");
             if (!Function.Call<bool>(Hash.HAS_SOUND_FINISHED, SoundId))
             {
                 Function.Call(Hash.STOP_SOUND, SoundId);
@@ -1009,23 +1008,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                 SoundId2 = 0;
             }
             HasDrawScreenSoundPlayed = false;
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Common");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Decor");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_GridDetails");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Grid");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Print0");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Print1");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Print2");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "MPFClone_Print3");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggame");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggamebg");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggamewin");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggamewin2");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggamewin3");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggameoverlay");
-            Function.Call(Hash.SET_STREAMED_TEXTURE_DICT_AS_NO_LONGER_NEEDED, "mphackinggameoverlay1");
-            Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Fingerprint_Match");
-            Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/Door_Hacking");
+            UnloadStreamedTextureDicts();
+            ReleaseScriptAudioBanks();
         }
 
         #endregion

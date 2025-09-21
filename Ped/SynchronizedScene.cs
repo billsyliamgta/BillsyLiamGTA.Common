@@ -163,6 +163,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             Rotation = rotation;
         }
 
+        public SynchronizedScene(Prop prop)
+        {
+            Position = prop.Position;
+            Rotation = prop.Rotation;
+        }
+
         #endregion
 
         #region Functions

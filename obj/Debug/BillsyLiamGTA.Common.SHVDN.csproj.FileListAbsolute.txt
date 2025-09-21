@@ -16,3 +16,12 @@ C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN\bin\Debug\BillsyLiamGTA.Co
 C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN\bin\Debug\BillsyLiamGTA.Common.SHVDN.pdb
 C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN\obj\Debug\BillsyLiamGTA.Common.SHVDN.dll
 C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN\obj\Debug\BillsyLiamGTA.Common.SHVDN.pdb
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\bin\Debug\BillsyLiamGTA.Common.SHVDN.dll
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\bin\Debug\BillsyLiamGTA.Common.SHVDN.pdb
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\bin\Debug\ScriptHookVDotNet3.dll
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\bin\Debug\ScriptHookVDotNet3.pdb
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Debug\BillsyLiamGTA.Common.SHVDN.csproj.AssemblyReference.cache
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Debug\BillsyLiamGTA.Common.SHVDN.csproj.CoreCompileInputs.cache
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Debug\BillsyLi.10A9B937.Up2Date
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Debug\BillsyLiamGTA.Common.SHVDN.dll
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Debug\BillsyLiamGTA.Common.SHVDN.pdb

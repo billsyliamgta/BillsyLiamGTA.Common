@@ -80,55 +80,38 @@ namespace BillsyLiamGTA.Common.SHVDN
             return "NULL";
         }
 
-        public static Dictionary<int, int> GetBagDrawableAndTexture(BagVariantType bagVariantType)
+        public static Dictionary<int, int> GetBagDrawableAndTexture(GTA.Ped ped, BagVariantType bagVariantType)
         {
             switch (bagVariantType)
             {
                 case BagVariantType.Invalid:
                 case BagVariantType.OriginalHeists:
                     {
-                        return new Dictionary<int, int>() { { 45, 0 } };
+                        if (ped.Model == PedHash.FreemodeMale01 || ped.Model == PedHash.FreemodeFemale01)
+                            return new Dictionary<int, int>() { { 45, 0 } };
+                        else
+                            return new Dictionary<int, int>() { { 1, 0 } };
                     }
                 case BagVariantType.CasinoYungAncestor:
-                    {
-                        return new Dictionary<int, int>() { { 82, 9 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 9 } };
                 case BagVariantType.CasinoRegular:
-                    {
-                        return new Dictionary<int, int>() { { 82, 0 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 0 } };
                 case BagVariantType.CasinoMaintenance:
-                    {
-                        return new Dictionary<int, int>() { { 82, 1 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 1 } };
                 case BagVariantType.CasinoBugstars:
-                    {
-                        return new Dictionary<int, int>() { { 82, 8 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 8 } };
                 case BagVariantType.CasinoGeometric:
-                    {
-                        return new Dictionary<int, int>() { { 82, 13 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 13 } };
                 case BagVariantType.CasinoPattern:
-                    {
-                        return new Dictionary<int, int>() { { 82, 12 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 12 } };
                 case BagVariantType.CasinoGeometric2:
-                    {
-                        return new Dictionary<int, int>() { { 82, 15 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 15 } };
                 case BagVariantType.CasinoAggressive1:
-                    {
-                        return new Dictionary<int, int>() { { 82, 10 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 10 } };
                 case BagVariantType.CasinoAggressive2:
-                    {
-                        return new Dictionary<int, int>() { { 82, 11 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 11 } };
                 case BagVariantType.CasinoAggressive3:
-                    {
-                        return new Dictionary<int, int>() { { 82, 14 } };
-                    }
+                    return new Dictionary<int, int>() { { 82, 14 } };
             }
 
             return null;
@@ -139,7 +122,7 @@ namespace BillsyLiamGTA.Common.SHVDN
             for (int i = 0; i < BAG_VARIANT_COUNT; i++)
             {
                 BagVariantType type = (BagVariantType)i;
-                var bag = GetBagDrawableAndTexture(type).First();
+                var bag = GetBagDrawableAndTexture(ped, type).First();
 
                 if (Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped, 5) == bag.Key && Function.Call<int>(Hash.GET_PED_TEXTURE_VARIATION, ped, 5) == bag.Value)
                 {
@@ -160,10 +143,10 @@ namespace BillsyLiamGTA.Common.SHVDN
 
         public static void SetBagFromVariantType(GTA.Ped ped, BagVariantType bagVariantType)
         {
-            var bag = GetBagDrawableAndTexture(bagVariantType).First();
-            Function.Call(Hash.SET_PED_COMPONENT_VARIATION, ped, 5, bag.Key, bag.Value, 0);
+            var bag = GetBagDrawableAndTexture(ped, bagVariantType).First();
+            Function.Call(Hash.SET_PED_COMPONENT_VARIATION, ped, ped.Model == PedHash.FreemodeMale01 || ped.Model == PedHash.FreemodeFemale01 ? 5 : 9, bag.Key, bag.Value, 0);
         }
 
-        public static void RemoveBag(GTA.Ped ped) => Function.Call(Hash.SET_PED_COMPONENT_VARIATION, ped, 5, 0, 0, 0);
+        public static void RemoveBag(GTA.Ped ped) => Function.Call(Hash.SET_PED_COMPONENT_VARIATION, ped, ped.Model == PedHash.FreemodeMale01 || ped.Model == PedHash.FreemodeFemale01 ? 5 : 9, 0, 0, 0);
     }
 }

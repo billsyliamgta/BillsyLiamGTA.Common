@@ -1,0 +1,2 @@
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Release\BillsyLiamGTA.Common.SHVDN.csproj.AssemblyReference.cache
+C:\Users\Liam\source\repos\BillsyLiamGTA.Common.SHVDN-master\obj\Release\BillsyLiamGTA.Common.SHVDN.csproj.CoreCompileInputs.cache

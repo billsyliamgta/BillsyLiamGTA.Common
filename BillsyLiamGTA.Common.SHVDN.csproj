@@ -50,6 +50,7 @@
     <Compile Include="Audio\Sound.cs" />
     <Compile Include="BagManager.cs" />
     <Compile Include="CutsceneTools.cs" />
+    <Compile Include="DebugScript.cs" />
     <Compile Include="Elements\BaseScript.cs" />
     <Compile Include="Minigames\Artwork.cs" />
     <Compile Include="Minigames\BaseMinigame.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Minigames\Lockbox.cs" />
     <Compile Include="Minigames\MinigameValueAddedArgs.cs" />
     <Compile Include="Minigames\MinigameValueAddedEventHandler.cs" />
+    <Compile Include="Minigames\StackGrab.cs" />
     <Compile Include="Ped\Enemy.cs" />
     <Compile Include="Ped\EnemyHandler.cs" />
     <Compile Include="Ped\SynchronizedScene.cs" />
