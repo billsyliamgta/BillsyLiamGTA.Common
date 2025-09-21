@@ -1,10 +1,18 @@
-﻿using System.Linq;
+﻿/*
+* BillsyLiamGTA.Common - A ScripthookV .NET framework for Grand Theft Auto V
+* Copyright (C) 2025 BillsyLiamGTA
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*/
+using System.Linq;
 using System.Collections.Generic;
 using GTA;
 using GTA.Native;
 using BillsyLiamGTA.Common.SHVDN.Elements;
 using static BillsyLiamGTA.Common.SHVDN.Scaleform.BaseScaleform;
-
 
 namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
 {
@@ -68,7 +76,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
         /// </summary>
         public bool IsActive
         {
-            get => Function.Call<int>(Hash.GET_CURRENT_FRONTEND_MENU_VERSION) == BaseScript.GetHashKey(MenuHash);
+            get => Function.Call<int>(Hash.GET_CURRENT_FRONTEND_MENU_VERSION) == Extensions.GetHashKey(MenuHash);
         }
 
         /// <summary>
@@ -147,12 +155,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform.Frontend
         /// <summary>
         /// Activates the menu.
         /// </summary>
-        private void Activate() => Function.Call(Hash.ACTIVATE_FRONTEND_MENU, BaseScript.GetHashKey(MenuHash), false, -1);
+        private void Activate() => Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Extensions.GetHashKey(MenuHash), false, -1);
 
         /// <summary>
         /// Restarts the menu.
         /// </summary>
-        private void Restart() => Function.Call(Hash.RESTART_FRONTEND_MENU, BaseScript.GetHashKey(MenuHash), -1);
+        private void Restart() => Function.Call(Hash.RESTART_FRONTEND_MENU, Extensions.GetHashKey(MenuHash), -1);
 
         /// <summary>
         /// Adds a heading to the menu, if it doesn't already exist.

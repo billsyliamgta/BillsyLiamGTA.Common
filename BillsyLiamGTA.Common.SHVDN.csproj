@@ -50,8 +50,7 @@
     <Compile Include="Audio\Sound.cs" />
     <Compile Include="BagManager.cs" />
     <Compile Include="CutsceneTools.cs" />
-    <Compile Include="DebugScript.cs" />
-    <Compile Include="Elements\BaseScript.cs" />
+    <Compile Include="Elements\Extensions.cs" />
     <Compile Include="Minigames\Artwork.cs" />
     <Compile Include="Minigames\BaseMinigame.cs" />
     <Compile Include="Minigames\Fingerprint\FingerprintMinigame.cs" />

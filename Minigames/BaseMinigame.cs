@@ -1,4 +1,13 @@
-﻿using GTA;
+﻿/*
+* BillsyLiamGTA.Common - A ScripthookV .NET framework for Grand Theft Auto V
+* Copyright (C) 2025 BillsyLiamGTA
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*/
+using GTA;
 using GTA.Native;
 
 namespace BillsyLiamGTA.Common.SHVDN.Minigames
@@ -40,7 +49,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
 
         public MinigameValueAddedEventHandler ValueAdded { get; set; }
 
-        public BagManager.BagVariantType PreviousBagType;
+        public BagManager.BagVariantTypes PreviousBagType;
 
         #endregion
 
@@ -194,7 +203,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             Index = 0;
             SetInProgress(false);
             IsLooted = false;
-            PreviousBagType = BagManager.BagVariantType.Invalid;
+            PreviousBagType = BagManager.BagVariantTypes.Invalid;
         }
 
         public virtual void Dispose() => ResetGlobals();

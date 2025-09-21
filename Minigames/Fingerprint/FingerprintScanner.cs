@@ -1,4 +1,13 @@
-﻿using GTA;
+﻿/*
+* BillsyLiamGTA.Common - A ScripthookV .NET framework for Grand Theft Auto V
+* Copyright (C) 2025 BillsyLiamGTA
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*/
+using GTA;
 using GTA.UI;
 using GTA.Math;
 using GTA.Native;
@@ -55,7 +64,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 
         private int ThermalBurnPtfxStartedGameTime = 0;
 
-        private BagManager.BagVariantType PreviousBagType;
+        private BagManager.BagVariantTypes PreviousBagType;
 
         private Prop Bag;
 
@@ -497,7 +506,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                 Thermite = null;
             }
 
-            PreviousBagType = BagManager.BagVariantType.Invalid;
+            PreviousBagType = BagManager.BagVariantTypes.Invalid;
 
             if (Bag != null && Bag.Exists())
             {
