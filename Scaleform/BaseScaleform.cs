@@ -13,14 +13,26 @@ using GTA.Native;
 
 namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
+    /// <summary>
+    /// A base for creating Scaleform classes.
+    /// </summary>
     public abstract class BaseScaleform
     {
         #region Properties
 
+        /// <summary>
+        /// The handle of the Scaleform.
+        /// </summary>
         public int Handle { get; protected set; } = 0;
 
+        /// <summary>
+        /// The name of the Scaleform.
+        /// </summary>
         public string Name { get; protected set; } = string.Empty;
 
+        /// <summary>
+        /// Whether or not the Scaleform has loaded.
+        /// </summary>
         public bool HasLoaded => Function.Call<bool>(Hash.HAS_SCALEFORM_MOVIE_LOADED, Handle);
 
         public BaseScaleform(string name)
@@ -32,13 +44,16 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 
         #region Functions
 
-        public void CallFunction(string function, params object[] args)
+        public bool CallFunction(string function, params object[] args)
         {
             if (Function.Call<bool>(Hash.BEGIN_SCALEFORM_MOVIE_METHOD, Handle, function))
             {
                 PushArgsInternal(args);
                 Function.Call(Hash.END_SCALEFORM_MOVIE_METHOD);
+                return true;
             }
+
+            return false;
         }
 
         public static bool CallFunctionFrontend(string function, params object[] args)
@@ -132,4 +147,5 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 
         #endregion
     }
+
 }
