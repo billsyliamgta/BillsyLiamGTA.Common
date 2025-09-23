@@ -35,6 +35,10 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
         /// </summary>
         public bool HasLoaded => Function.Call<bool>(Hash.HAS_SCALEFORM_MOVIE_LOADED, Handle);
 
+        #endregion
+
+        #region Constructors
+        
         public BaseScaleform(string name)
         {
             Name = name;
@@ -149,3 +153,4 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
     }
 
 }
+
