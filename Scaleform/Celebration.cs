@@ -17,25 +17,25 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
     {
         #region Fields
 
-        public const string ScriptAudioBank = "HUD_321_GO";
+        private const string ScriptAudioBank = "HUD_321_GO";
 
-        public const string WallId = "intro";
+        private const string WallId = "intro";
 
-        public const int ForegroundAlpha = 40;
+        private const int ForegroundAlpha = 40;
 
-        public const int BackgroundAlpha = 75;
+        private const int BackgroundAlpha = 75;
 
-        public const int Transition = 333;
+        private const int Transition = 333;
 
         #endregion
 
         #region Properties
 
-        public CelebrationMain Main;
+        private CelebrationMain Main;
 
-        public CelebrationBackground Background;
+        private CelebrationBackground Background;
 
-        public CelebrationForeground Foreground;
+        private CelebrationForeground Foreground;
 
         public enum Textures
         {
@@ -64,7 +64,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         public Celebration()
         {
@@ -90,9 +90,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
             while (!Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, ScriptAudioBank, false, -1))
             {
                 if (Game.GameTime - start > timeout)
-                {
                     throw new TimeoutException($"ERROR: Timed out while loading Celebration script audio bank '{ScriptAudioBank}'.");
-                }
                 Script.Wait(0);
             }
             Main.Load();
@@ -110,8 +108,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 
         private void DrawAll()
         {
-            Background.DrawFullscreenMasked(Foreground);
-            Main.DrawFullscreen();
+            Background.Render2DMasked(Foreground);
+            Main.Render2D();
         }
 
         /// <summary>

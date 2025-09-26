@@ -46,8 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioScene.cs" />
-    <Compile Include="Audio\Sound.cs" />
     <Compile Include="BagManager.cs" />
     <Compile Include="CutsceneTools.cs" />
     <Compile Include="Elements\Extensions.cs" />
@@ -72,6 +70,7 @@
     <Compile Include="Scaleform\CelebrationBackground.cs" />
     <Compile Include="Scaleform\CelebrationForeground.cs" />
     <Compile Include="Scaleform\CelebrationMain.cs" />
+    <Compile Include="Scaleform\MpBigMessageFreemode.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenu.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuClosedArgs.cs" />
     <Compile Include="Scaleform\Frontend\FrontendLobbyMenuClosedEventHandler.cs" />
@@ -89,6 +88,7 @@
     <Compile Include="Scaleform\HeistCelebrationForeground.cs" />
     <Compile Include="Scaleform\HeistCelebrationMain.cs" />
     <Compile Include="Scaleform\InstructionalButtons.cs" />
+    <Compile Include="Scaleform\StatShard.cs" />
     <Compile Include="TimerBars\BaseTimerBar.cs" />
     <Compile Include="TimerBars\CountdownTimerBar.cs" />
     <Compile Include="TimerBars\ProgressTimerBar.cs" />

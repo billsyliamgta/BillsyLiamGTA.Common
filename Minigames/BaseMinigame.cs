@@ -19,11 +19,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
         public struct MinigameStruct
         {
             public int f_1;
-
             public float Phase;
-
-            public float f_14;
-
+            public float Rate;
             public float f_15;
         }
 
@@ -125,8 +122,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     uParam0->f_15 = func_350((uParam0->f_15 - ((0.0135f * 30f) * Function.Call<float>(Hash.TIMESTEP))), fParam1, fParam2);
                     break;
             }
-            func_7678(&(uParam0->f_14), uParam0->f_15, 0.02f, true);
-            uParam0->f_14 = func_350(uParam0->f_14, fParam1, fParam2);
+            func_7678(&(uParam0->Rate), uParam0->f_15, 0.02f, true);
+            uParam0->Rate = func_350(uParam0->Rate, fParam1, fParam2);
         }
 
         public unsafe void func_7678(float* uParam0, float fParam1, float fParam2, bool bParam3)//Position - 0x233901
@@ -196,7 +193,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
         {
             Data.f_1 = 0;
             Data.Phase = 0f;
-            Data.f_14 = 0f;
+            Data.Rate = 0f;
             Data.f_15 = 0f;
             MinRate = 0.75f;
             MaxRate = 1.5f;

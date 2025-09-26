@@ -13,6 +13,7 @@ using GTA.UI;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.SHVDN.Ped;
+using static BillsyLiamGTA.Common.SHVDN.Elements.Extensions;
 
 namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
@@ -129,23 +130,21 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
 
         #region Functions
 
-        public void SetPaintingUp()
+        public void SetPaintingUp(int timeout = 2000)
         {
             if (!HasSetPaintingUp)
             {
-                Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
-                int start = Game.GameTime;
-                while (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig11_steal_painting@male@"))
+                RequestAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
+                int start = GetGameTimer();
+                while (!HasAnimDictLoaded("anim_heist@hs3f@ig11_steal_painting@male@"))
                 {
-                    if (Game.GameTime - start > 2000)
-                    {
+                    if (GetGameTimer() - start > timeout)
                         throw new TimeoutException("ERROR: Timed out while setting up painting.");
-                    }
                     Script.Wait(0);
                 }
-                Painting.Position = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_top_left_enter_ch_prop_vault_painting_01a", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                Painting.Rotation = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_top_left_enter_ch_prop_vault_painting_01a", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
+                Painting.Position = GetAnimInitialOffsetPosition("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_top_left_enter_ch_prop_vault_painting_01a", Cabinet.Position, Cabinet.Rotation, 0f);
+                Painting.Rotation = GetAnimInitialOffsetRotation("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_top_left_enter_ch_prop_vault_painting_01a", Cabinet.Position, Cabinet.Rotation, 0f);
+                RemoveAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
                 Painting.IsPositionFrozen = true;
                 HasSetPaintingUp = true;
             }
@@ -158,13 +157,15 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             {
                 case 0:
                     {
-                        if (IsLooted) return;
-                        Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
+                        if (IsLooted) 
+                            return;
+                        RequestAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
                         Function.Call(Hash.REQUEST_ADDITIONAL_TEXT, "FMMC", 2);
-                        if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig11_steal_painting@male@") && Function.Call<bool>(Hash.HAS_THIS_ADDITIONAL_TEXT_LOADED, "FMMC", 2) && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS", false, -1))
+                        if (HasAnimDictLoaded("anim_heist@hs3f@ig11_steal_painting@male@") && Function.Call<bool>(Hash.HAS_THIS_ADDITIONAL_TEXT_LOADED, "FMMC", 2) && RequestScriptAudioBank("DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS", false))
                         {
-                            Vector3 offsetPos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                            Vector3 offsetRot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
+                            Vector3 offsetPos = GetAnimInitialOffsetPosition("anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position, Cabinet.Rotation, 0f);
+                            Vector3 offsetRot = GetAnimInitialOffsetRotation("anim_heist@hs3f@ig11_steal_painting@male@", string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip, Cabinet.Position, Cabinet.Rotation, 0f);
+
                             if (Game.Player.Character.Position.DistanceTo(offsetPos) < 1f)
                             {
                                 Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, HelpTextEntryStrings[0], true);
@@ -185,7 +186,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     break;
                 case 1:
                     {
-                        if (Function.Call<int>(Hash.GET_SCRIPT_TASK_STATUS, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "SCRIPT_TASK_GO_STRAIGHT_TO_COORD")) == 7)
+                        if (Function.Call<int>(Hash.GET_SCRIPT_TASK_STATUS, Game.Player.Character, GetHashKey("SCRIPT_TASK_GO_STRAIGHT_TO_COORD")) == 7)
                         {
                             string clip = string.IsNullOrEmpty(ResumeClip) ? $"ver_0{Version}_top_left_enter" : ResumeClip;
                             PreviousBagType = BagManager.GetBagVariantTypeFromPed(Game.Player.Character);
@@ -232,13 +233,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                         if (PlayerScene != null && PlayerScene.IsFinished)
                         {
                             if (ResumeIndex == 0)
-                            {
                                 Index++;
-                            }
                             else
-                            {
                                 Index = ResumeIndex;
-                            }
                         }
                     }
                     break;
@@ -251,12 +248,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
                             PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_cam");
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.IsLooped = true;
                             if (PaintingScene != null)
                             {
                                 PaintingScene.Generate();
                                 PaintingScene.PlayEntity(Painting, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_ch_prop_vault_painting_01a");
-                                PaintingScene.SetLooped(true);
+                                PaintingScene.IsLooped = true;
                             }
                         }
                         else
@@ -289,7 +286,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     break;
                 case 4:
                     {
-                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
+                        if (PlayerScene != null && PlayerScene.IsFinished) 
+                            Index++;
                     }
                     break;
                 case 5:
@@ -301,7 +299,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_hei_p_m_bag_var22_arm_s");
                             PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_w_me_switchblade");
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_right_idle_cam");
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.IsLooped = true;
                         }
                         else
                         {
@@ -333,7 +331,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     break;
                 case 6:
                     {
-                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
+                        if (PlayerScene != null && PlayerScene.IsFinished) 
+                            Index++;
                     }
                     break;
                 case 7:
@@ -345,7 +344,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_hei_p_m_bag_var22_arm_s");
                             PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_w_me_switchblade");
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_bottom_right_idle_cam");
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.IsLooped = true;
                         }
                         else
                         {
@@ -377,7 +376,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     break;
                 case 8:
                     {
-                        if (PlayerScene != null && PlayerScene.IsFinished) Index++;
+                        if (PlayerScene != null && PlayerScene.IsFinished) 
+                            Index++;
                     }
                     break;
                 case 9:
@@ -389,7 +389,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene.PlayEntity(Bag, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_hei_p_m_bag_var22_arm_s");
                             PlayerScene.PlayEntity(Knife, "anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_w_me_switchblade");
                             PlayerScene.PlayCam("anim_heist@hs3f@ig11_steal_painting@male@", $"ver_0{Version}_cutting_top_left_idle_cam");
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.IsLooped = true;
                         }
                         else
                         {
@@ -484,8 +484,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                 Knife.Delete();
                                 Knife = null;
                             }
-                            Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
-                            Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
+                            RemoveAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
+                            ReleaseNamedScriptAudioBank("DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
                             Game.Player.SetControlState(true);
                             Game.Player.Character.Task.ClearAll();
                             Index = 0;
@@ -533,8 +533,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 2);
             Game.Player.SetControlState(true);
             Game.Player.Character.Task.ClearAllImmediately();
-            Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
-            Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
+            RemoveAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
+            ReleaseNamedScriptAudioBank("DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
         }
 
         public override void Dispose()
@@ -576,8 +576,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 2);
             Game.Player.SetControlState(true);
             Game.Player.Character.Task.ClearAllImmediately();
-            Function.Call(Hash.REMOVE_ANIM_DICT, "anim_heist@hs3f@ig11_steal_painting@male@");
-            Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
+            RemoveAnimDict("anim_heist@hs3f@ig11_steal_painting@male@");
+            ReleaseNamedScriptAudioBank("DLC_HEIST3/HEIST_FINALE_STEAL_PAINTINGS");
         }
 
         #endregion

@@ -3,8 +3,8 @@ using GTA.UI;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.SHVDN.Ped;
-using BillsyLiamGTA.Common.SHVDN.Audio;
 using static BillsyLiamGTA.Common.SHVDN.Minigames.TrollyGrab;
+using static BillsyLiamGTA.Common.SHVDN.Elements.Extensions;
 
 /*
 * BillsyLiamGTA.Common - A ScripthookV .NET framework for Grand Theft Auto V
@@ -75,7 +75,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             PlayerScene = new SynchronizedScene(Stack);
             PlayerScene.Generate();
             PlayerScene.PlayPed(Game.Player.Character, animDict, "exit", 1.5f, -8.0f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-            PlayerScene.PlayEntity(Bag, animDict, "exit_bag", 1f, -1f);
+            PlayerScene.PlayEntity(Bag, animDict, "exit_bag", 1f, -1f, SynchronizedScene.PlaybackFlags.USE_PHYSICS);
             StackScene.Rate = 0f;
             Index = 4;
         }
@@ -151,7 +151,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
         }
 
         /// <summary>
-        /// Gets the appropriate anim dict for the <see cref="Type"/>
+        /// Gets the appropriate anim dict for the <see cref="Type"/>.
         /// </summary>
         /// <returns></returns>
         private string GetAnimDict()
@@ -183,10 +183,10 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     {
                         if (IsLooted)
                             return;
-                        Function.Call(Hash.REQUEST_ANIM_DICT, animDict);
+                        RequestAnimDict(animDict);
                         Function.Call(Hash.REQUEST_ADDITIONAL_TEXT, "MC_PLAY", 0);
                         Function.Call(Hash.REQUEST_ADDITIONAL_TEXT, "HACK", 3);
-                        if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, animDict) && Function.Call<bool>(Hash.HAS_THIS_ADDITIONAL_TEXT_LOADED, "MC_PLAY", 0) && Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 3) && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEI4/DLCHEI4_GENERIC_01", false, -1))
+                        if (HasAnimDictLoaded(animDict) && Function.Call<bool>(Hash.HAS_THIS_ADDITIONAL_TEXT_LOADED, "MC_PLAY", 0) && Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 3) && Function.Call<bool>(Hash.REQUEST_SCRIPT_AUDIO_BANK, "DLC_HEI4/DLCHEI4_GENERIC_01", false, -1))
                         {
                             Vector3 offsetPos = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, animDict, "enter", Stack.Position.X, Stack.Position.Y, Stack.Position.Z, Stack.Rotation.X, Stack.Rotation.Y, Stack.Rotation.Z, 0f, 2);
                             Vector3 offsetRot = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, animDict, "enter", Stack.Position.X, Stack.Position.Y, Stack.Position.Z, Stack.Rotation.X, Stack.Rotation.Y, Stack.Rotation.Z, 0f, 2);
@@ -199,7 +199,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                     Game.Player.Character.CanSwitchWeapons = false;
                                     Game.Player.Character.Weapons.Select(WeaponHash.Unarmed);
                                     SetInProgress(true);
-                                    AudioScene.Start("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+                                    StartAudioScene("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
                                     PreviousBagType = BagManager.GetBagVariantTypeFromPed(Game.Player.Character);
                                     Bag = BagManager.CreateBagPropFromPed(Game.Player.Character);
                                     if (Bag != null && Bag.Exists())
@@ -223,7 +223,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene = new SynchronizedScene(Stack);
                             PlayerScene.Generate();
                             PlayerScene.PlayPed(Game.Player.Character, animDict, "enter", 1.5f, -8.0f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, animDict, "enter_bag", 1000f, -8f);
+                            PlayerScene.PlayEntity(Bag, animDict, "enter_bag", 1000f, -8f, SynchronizedScene.PlaybackFlags.USE_PHYSICS);
                             Function.Call(Hash.PLAY_FACIAL_ANIM, Game.Player.Character, "enter_facial", animDict);
                             StackScene = new SynchronizedScene(Stack);
                             StackScene.Generate();
@@ -250,8 +250,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                     {
                         if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, animDict, "grab", 3))
                         {
-                            PlayerScene.Rate = Data.f_14;
-                            StackScene.Rate = Data.f_14;
+                            if (PlayerScene.IsRunning)
+                                PlayerScene.Rate = Data.Rate;
+
+                            if (StackScene.IsRunning)
+                                StackScene.Rate = Data.Rate;
+
                             Data.Phase = PlayerScene.Phase;
 
                             if (Function.Call<bool>(Hash.HAS_ANIM_EVENT_FIRED, Game.Player.Character, Function.Call<int>(Hash.GET_HASH_KEY, "LOOTED")))
@@ -275,12 +279,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                         break;
                                 }
                                 ValueAdded?.Invoke(this, new MinigameValueAddedArgs(Function.Call<int>(Hash.GET_RANDOM_INT_IN_RANGE, min, max), true));
-                                if (Data.f_14 == 0.75f)
+                                if (Data.Rate == 0.75f)
                                 {
                                     PlayerScene.Generate();
                                     PlayerScene.PlayPed(Game.Player.Character, animDict, "grab_idle", 2f, -8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                                    PlayerScene.PlayEntity(Bag, animDict, "grab_idle_bag", 2f, -4f);
-                                    PlayerScene.SetLooped(true);
+                                    PlayerScene.PlayEntity(Bag, animDict, "grab_idle_bag", 2f, -4f, SynchronizedScene.PlaybackFlags.USE_PHYSICS);
+                                    PlayerScene.IsLooped = true;
                                     StackScene.Rate = 0f;
                                 }
                             }
@@ -293,11 +297,11 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                         }
                         else if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, animDict, "grab_idle", 3))
                         {
-                            if (Data.f_14 > 0.75f)
+                            if (Data.Rate > 0.75f)
                             {
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, animDict, "grab", 4f, -4f, SynchronizedScene.PlaybackFlags.UNKNOWN, SynchronizedScene.RagdollBlockingFlags.UNKNOWN, 1000f, SynchronizedScene.IkControlFlags.LINKED_FACIAL);
-                                PlayerScene.PlayEntity(Bag, animDict, "grab_bag", 2f, -8f);
+                                PlayerScene.PlayEntity(Bag, animDict, "grab_bag", 2f, -8f, SynchronizedScene.PlaybackFlags.USE_PHYSICS);
                                 PlayerScene.Phase = Data.Phase;
                             }
 
@@ -307,9 +311,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                         else
                         {
                             PlayerScene.Generate();
-                            PlayerScene.PlayPed(Game.Player.Character, animDict, "grab_idle", 2f, -8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
-                            PlayerScene.PlayEntity(Bag, animDict, "grab_idle_bag", 2f, -4f);
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.PlayPed(Game.Player.Character, animDict, "grab_idle", 2f, -8f, SynchronizedScene.PlaybackFlags.NONE);
+                            PlayerScene.PlayEntity(Bag, animDict, "grab_idle_bag", 1000f, -4f, SynchronizedScene.PlaybackFlags.USE_PHYSICS);
+                            PlayerScene.IsLooped = true;
                         }
                     }
                     break;
@@ -329,9 +333,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             StackScene = null;
                             Game.Player.Character.CanSwitchWeapons = true;
                             SetInProgress(false);
-                            AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+                            StartAudioScene("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
                             Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEI4/DLCHEI4_GENERIC_01");
-                            Function.Call(Hash.REMOVE_ANIM_DICT, animDict);
+                            RemoveAnimDict(animDict);
                             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
                             Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 3);
                             Game.Player.SetControlState(true);
@@ -359,8 +363,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             PlayerScene = null;
             StackScene?.Dispose();
             StackScene = null;
-            if (AudioScene.IsActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE"))
-                AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+            if (IsAudioSceneActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE"))
+                StopAudioScene("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
             Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEI4/DLCHEI4_GENERIC_01");
             Function.Call(Hash.REMOVE_ANIM_DICT, GetAnimDict());
             if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 0))
@@ -390,10 +394,10 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             PlayerScene = null;
             StackScene?.Dispose();
             StackScene = null;
-            if (AudioScene.IsActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE"))
-                AudioScene.Stop("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
+            if (IsAudioSceneActive("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE"))
+                StopAudioScene("DLC_HEIST_MINIGAME_PAC_CASH_GRAB_SCENE");
             Function.Call(Hash.RELEASE_NAMED_SCRIPT_AUDIO_BANK, "DLC_HEI4/DLCHEI4_GENERIC_01");
-            Function.Call(Hash.REMOVE_ANIM_DICT, GetAnimDict());
+            RemoveAnimDict(GetAnimDict());
             if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 0))
                 Function.Call(Hash.CLEAR_ADDITIONAL_TEXT, 0);
             if (Function.Call<bool>(Hash.HAS_ADDITIONAL_TEXT_LOADED, 3))

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections.Generic;
 using GTA;
 using GTA.Native;
+using System;
 
 namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 {
@@ -38,6 +39,14 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
         #region Functions
 
         public void SetPool(List<Dictionary<Control, string>> pool) => Pool = pool;
+
+        public void ResetPool()
+        {
+            if (Pool?.Count > 0)
+                Pool.Clear();
+
+            Pool = null;
+        }
 
         public bool AddButton(Dictionary<Control, string> button)
         {
@@ -74,7 +83,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
             if (ShouldUpdate)
             {
                 CallFunction("CLEAR_ALL");
-                CallFunction("TOGGLE_MOUSE_BUTTONS", MouseEnabled ? 1 : 0);
+                CallFunction("TOGGLE_MOUSE_BUTTONS", Convert.ToInt32(MouseEnabled));
                 // CallFunction("CREATE_CONTAINER");
                 if (Pool != null)
                 {
@@ -97,7 +106,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
                 CallFunction("DRAW_INSTRUCTIONAL_BUTTONS");
                 ShouldUpdate = false;
             }
-            DrawFullscreen();
+            Render2D();
         }
 
         #endregion

@@ -14,9 +14,9 @@ using GTA;
 using GTA.Native;
 using static GTA.Game;
 using BaseScaleform = BillsyLiamGTA.Common.SHVDN.Scaleform.BaseScaleform;
-using BillsyLiamGTA.Common.SHVDN.Audio;
 using BillsyLiamGTA.Common.SHVDN.Scaleform;
 using BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars;
+using static BillsyLiamGTA.Common.SHVDN.Elements.Extensions;
 
 namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 {
@@ -568,7 +568,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                         {
                             InstructionalButtons = new InstructionalButtons();
                             InstructionalButtons.Load();                           
-                            AudioScene.Start("DLC_H3_Fingerprint_Hack_Scene");
+                            StartAudioScene("DLC_H3_Fingerprint_Hack_Scene");
                             Bink = Function.Call<int>(Hash.SET_BINK_MOVIE, "INTRO_FC");
                             Function.Call(Hash.PLAY_BINK_MOVIE, Bink);
                             Function.Call(Hash.SET_BINK_MOVIE_TIME, Bink, 0f);
@@ -939,7 +939,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                             Function.Call(Hash.STOP_BINK_MOVIE, Bink);
                             Function.Call(Hash.RELEASE_BINK_MOVIE, Bink);
                             Bink = 0;
-                            AudioScene.Stop("DLC_H3_Fingerprint_Hack_Scene");
+                            StartAudioScene("DLC_H3_Fingerprint_Hack_Scene");
                             GameplayCamera.RelativeHeading = 0f;
                             GameplayCamera.RelativePitch = 1f;
                             Index++;
@@ -1002,8 +1002,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
             InstructionalButtons?.Dispose();
             InstructionalButtons = null;
             TimerBarPool.ShouldMoveUp = false;
-            if (AudioScene.IsActive("DLC_H3_Fingerprint_Hack_Scene"))
-                AudioScene.Stop("DLC_H3_Fingerprint_Hack_Scene");
+            if (IsAudioSceneActive("DLC_H3_Fingerprint_Hack_Scene"))
+                StopAudioScene("DLC_H3_Fingerprint_Hack_Scene");
             if (!Function.Call<bool>(Hash.HAS_SOUND_FINISHED, SoundId))
             {
                 Function.Call(Hash.STOP_SOUND, SoundId);

@@ -36,14 +36,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
         /// </summary>
         public float Phase
         {
-            get
-            {
-                return Function.Call<float>(Hash.GET_SYNCHRONIZED_SCENE_PHASE, Handle);
-            }
-            set
-            {
-                Function.Call(Hash.SET_SYNCHRONIZED_SCENE_PHASE, Handle, value);
-            }
+            get => Function.Call<float>(Hash.GET_SYNCHRONIZED_SCENE_PHASE, Handle);
+            set => Function.Call(Hash.SET_SYNCHRONIZED_SCENE_PHASE, Handle, value);
         }
 
         /// <summary>
@@ -51,20 +45,37 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
         /// </summary>
         public float Rate
         {
-            get
-            {
-                return Function.Call<float>(Hash.GET_SYNCHRONIZED_SCENE_RATE, Handle);
-            }
-            set
-            {
-                Function.Call(Hash.SET_SYNCHRONIZED_SCENE_RATE, Handle, value);
-            }
+            get => Function.Call<float>(Hash.GET_SYNCHRONIZED_SCENE_RATE, Handle);
+            set => Function.Call(Hash.SET_SYNCHRONIZED_SCENE_RATE, Handle, value);
         }
 
         /// <summary>
-        /// Whether or not the Synchronized Scene is finished.
+        /// Return's true if the Synchronized Scene is finished.
         /// </summary>
         public bool IsFinished => Phase > 0.999f;
+
+        /// <summary>
+        /// Returns true if the Synchronized Scene is currently running.
+        /// </summary>
+        public bool IsRunning => Function.Call<bool>(Hash.IS_SYNCHRONIZED_SCENE_RUNNING, Handle);
+
+        /// <summary>
+        /// Gets and sets if the Synchronized Scene is looped.
+        /// </summary>
+        public bool IsLooped
+        {
+            get => Function.Call<bool>(Hash.IS_SYNCHRONIZED_SCENE_LOOPED, Handle);
+            set => Function.Call(Hash.SET_SYNCHRONIZED_SCENE_LOOPED, Handle, value);
+        }
+
+        /// <summary>
+        /// Gets and sets if the Synchronized Scene should hold last frame.
+        /// </summary>
+        public bool ShouldHoldLastFrame
+        {
+            get => Function.Call<bool>(Hash.IS_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME, Handle);
+            set => Function.Call(Hash.SET_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME, Handle, value);
+        }
 
         /// <summary>
         /// Position of the Synchronized Scene.
@@ -91,6 +102,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             TAG_SYNC_OUT = 2,
             DONT_INTERRUPT = 4,
             ON_ABORT_STOP_SCENE = 8,
+            /// <summary>
+            /// Found flag 13 in some R* scripts, but I'm unsure what it does.
+            /// </summary>
             UNKNOWN = 13,
             ABORT_ON_WEAPON_DAMAGE = 16,
             BLOCK_MOVER_UPDATE = 32,
@@ -119,6 +133,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             FIRE = 4,
             ELECTROCUTION = 8,
             PLAYER_IMPACT = 16,
+            /// <summary>
+            /// Found flag 18 in some R* scripts, but I'm unsure what it does.
+            /// </summary>
             UNKNOWN = 18,
             EXPLOSION = 32,
             IMPACT_OBJECT = 64,
@@ -158,7 +175,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         public SynchronizedScene(Vector3 position, float heading = 0f)
         {
@@ -194,9 +211,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             while (!IsValid) // Wait for the Synchronized Scene to validate.
             {
                 if (Game.GameTime - start > timeout) // And timeout if not.
-                {
                     throw new TimeoutException("ERROR: Timed out while validating Synchronized Scene.");
-                }
                 Script.Wait(0);
             }
         }
@@ -252,10 +267,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             if (IsValid)
             {
                 if (Camera == null)
-                {
                     Camera = Function.Call<Camera>(Hash.CREATE_CAM, "DEFAULT_ANIMATED_CAMERA", true);
-                }
-
                 Function.Call(Hash.PLAY_SYNCHRONIZED_CAM_ANIM, Camera, Handle, animName, animDict);
                 ScriptCameraDirector.StartRendering();
             }
@@ -266,33 +278,25 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
             if (IsValid)
             {
                 if (Function.Call<bool>(Hash.PLAY_SYNCHRONIZED_AUDIO_EVENT, Handle))
-                {
                     return true;
-                }
             }
 
             return false;
         }
 
-        /// <summary>
-        /// Makes the Synchronized Scene looped.
-        /// </summary>
-        /// <param name="toggle"></param>
+        [Obsolete("Use 'IsLooped' property instead.")]
         public void SetLooped(bool toggle)
         {
             if (IsValid)
-                Function.Call(Hash.SET_SYNCHRONIZED_SCENE_LOOPED, Handle, toggle);
+                IsLooped = toggle;
         }
 
-        /// <summary>
-        /// Sets the Synchronized Scene to hold the last frame when it finishes.
-        /// </summary>
-        /// <param name="toggle"></param>
+        [Obsolete("Use 'ShouldHoldLastFrame' property instead.")]
 
         public void SetHoldLastFrame(bool toggle)
         {
             if (IsValid)
-                Function.Call(Hash.SET_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME, Handle, toggle);
+                ShouldHoldLastFrame = toggle;
         }
 
         /// <summary>
@@ -303,10 +307,31 @@ namespace BillsyLiamGTA.Common.SHVDN.Ped
         {
             if (Camera != null && Camera.Exists())
             {
-                if (shouldStopRendering) ScriptCameraDirector.StopRendering();
+                if (shouldStopRendering) 
+                    ScriptCameraDirector.StopRendering();
                 Camera.Delete();
                 Camera = null;
             }
+        }
+
+        /// <summary>
+        /// Attaches the entity to the Synchronized Scene. Use <see cref="Detach"/> to revert this.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="bone"></param>
+        public void AttachToEntity(Entity entity, EntityBone bone)
+        {
+            if (IsValid && IsRunning)
+                Function.Call(Hash.ATTACH_SYNCHRONIZED_SCENE_TO_ENTITY, Handle, entity, bone.Index);
+        }
+
+        /// <summary>
+        /// Detaches the Synchronized Scene.
+        /// </summary>
+        public void Detach()
+        {
+            if (IsValid && IsRunning)
+                Function.Call(Hash.DETACH_SYNCHRONIZED_SCENE, Handle);
         }
 
         /// <summary>

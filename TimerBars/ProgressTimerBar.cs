@@ -22,17 +22,11 @@ namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
 
         public float Progress
         {
-            get
-            {
-                return _progress;
-            }
-            set
-            {
-                _progress = Extensions.Clamp(value, 0f, 1f);
-            }
+            get => _progress;
+            set => _progress = Extensions.Clamp(value, 0f, 1f);
         }
 
-        public Color FgColour = Color.FromArgb(255, 140, 140, 140);
+        public Color ForegroundColour = Color.FromArgb(155, 240, 240, 240);
 
         public Color Colour = Color.FromArgb(255, 240, 240, 240);
 
@@ -53,7 +47,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Graphics.TimerBars
         {
             base.Draw(y);
             y += BarOffset;
-            Function.Call(Hash.DRAW_RECT, ProgressBaseX, y, ProgressWidth, ProgressHeight, FgColour.R, FgColour.G, FgColour.B, FgColour.A, false);
+            Function.Call(Hash.DRAW_RECT, ProgressBaseX, y, ProgressWidth, ProgressHeight, ForegroundColour.R, ForegroundColour.G, ForegroundColour.B, ForegroundColour.A, false);
             float fgWidth = ProgressWidth * Progress;
             float fgX = (ProgressBaseX - ProgressWidth * 0.5f) + (fgWidth * 0.5f);
             Function.Call(Hash.DRAW_RECT, fgX, y, fgWidth, ProgressHeight, Colour.R, Colour.G, Colour.B, Colour.A, false);

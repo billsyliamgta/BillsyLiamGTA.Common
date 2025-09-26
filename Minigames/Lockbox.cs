@@ -12,6 +12,7 @@ using GTA.UI;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.SHVDN.Ped;
+using static BillsyLiamGTA.Common.SHVDN.Elements.Extensions;
 
 namespace BillsyLiamGTA.Common.SHVDN.Minigames
 {
@@ -63,7 +64,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
             {
                 case 0:
                     {
-                        if (IsLooted) return;
+                        if (IsLooted) 
+                            return;
                         Function.Call(Hash.REQUEST_ANIM_DICT, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_01@male@");
                         Function.Call(Hash.REQUEST_ANIM_DICT, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_02@male@");
                         Function.Call(Hash.REQUEST_ANIM_DICT, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_03@male@");
@@ -71,9 +73,9 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                         Function.Call(Hash.REQUEST_ADDITIONAL_TEXT, "MC_PLAY", 0);
                         if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_01@male@") && Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_02@male@") && Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_03@male@") && Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_04@male@") && Function.Call<bool>(Hash.HAS_THIS_ADDITIONAL_TEXT_LOADED, "MC_PLAY", 0))
                         {
-                            Vector3 posOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "enter", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                            Vector3 rotOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "enter", Cabinet.Position.X, Cabinet.Position.Y, Cabinet.Position.Z, Cabinet.Rotation.X, Cabinet.Rotation.Y, Cabinet.Rotation.Z, 0f, 2);
-                            if (Game.Player.Character.Position.DistanceTo(posOffset) < 1f && !Game.Player.Character.IsSprinting && !Game.Player.Character.IsJumping)
+                            Vector3 offsetPos = GetAnimInitialOffsetPosition($"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "enter", Cabinet.Position, Cabinet.Rotation, 0f);
+                            Vector3 offsetRot = GetAnimInitialOffsetRotation($"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "enter", Cabinet.Position, Cabinet.Rotation, 0f);
+                            if (Game.Player.Character.Position.DistanceTo(offsetPos) < 1f && !Game.Player.Character.IsSprinting && !Game.Player.Character.IsJumping)
                             {
                                 Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "CAS_DRIL_HELP1" /* GXT: Press ~INPUT_CONTEXT~ to begin drilling the lockers. */, true);
                                 if (Game.IsControlJustPressed(Control.Context))
@@ -82,7 +84,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                     SetInProgress(true);
                                     Function.Call(Hash.LOCK_MINIMAP_ANGLE, 0);
                                     Game.Player.SetControlState(false, SetPlayerControlFlags.LeaveCameraControlOn);
-                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, posOffset.X, posOffset.Y, posOffset.Z, 1f, 20000, rotOffset.Z, 0.75f);
+                                    Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Game.Player.Character, offsetPos.X, offsetPos.Y, offsetPos.Z, 1f, 20000, offsetPos.Z, 0.75f);
                                     Index++;
                                 }
                             }
@@ -137,7 +139,6 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                 case 3:
                     {
                         Function.Call(Hash.DISPLAY_HELP_TEXT_THIS_FRAME, "CHI_DRIL_HELP2" /* GXT: Hold ~INPUT_ATTACK~ to drill into the safety deposit boxes. ~n~Press ~INPUT_RELOAD~ to stop drilling the safety deposit boxes. */, true);
-
                         if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "action", 3))
                         {
                             Data.Phase = PlayerScene.Phase;
@@ -180,11 +181,17 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                         }
                                         break;
                                 }
-                                Function.Call(Hash.STOP_PARTICLE_FX_LOOPED, PtfxEffect);
-                                PtfxEffect = 0;
-                                Function.Call(Hash.STOP_SOUND, SoundId);
-                                Function.Call(Hash.RELEASE_SOUND_ID, SoundId);
-                                SoundId = 0;
+                                if (Function.Call<bool>(Hash.DOES_PARTICLE_FX_LOOPED_EXIST, PtfxEffect))
+                                {
+                                    Function.Call(Hash.STOP_PARTICLE_FX_LOOPED, PtfxEffect);
+                                    PtfxEffect = 0;
+                                }
+                                if (!Function.Call<bool>(Hash.HAS_SOUND_FINISHED, SoundId))
+                                {
+                                    Function.Call(Hash.STOP_SOUND, SoundId);
+                                    Function.Call(Hash.RELEASE_SOUND_ID, SoundId);
+                                    SoundId = 0;
+                                }
                                 PlayerScene.Generate();
                                 PlayerScene.PlayPed(Game.Player.Character, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", clip, 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
                                 PlayerScene.PlayEntity(Bag, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", clip + "_p_m_bag_var22_arm_s");
@@ -204,15 +211,12 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                 CamBlendOutDuration = 1750;
                                 CabinetScene = new SynchronizedScene(Cabinet.Position, Cabinet.Rotation);
                                 CabinetScene.Generate();
-                                if (Cabinet != null && Cabinet.Exists())
-                                {
-                                    CabinetScene.PlayEntity(Cabinet, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", clip + "_" + cabinet);
-                                    Function.Call(Hash.FORCE_ENTITY_AI_AND_ANIMATION_UPDATE, Cabinet);
-                                }
+                                CabinetScene.PlayEntity(Cabinet, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", clip + "_" + cabinet);
                                 Index++;
                             }
 
-                            if (Function.Call<bool>(Hash.DOES_PARTICLE_FX_LOOPED_EXIST, PtfxEffect)) Function.Call(Hash.SET_PARTICLE_FX_LOOPED_EVOLUTION, PtfxEffect, "power", 1f, false);
+                            if (Function.Call<bool>(Hash.DOES_PARTICLE_FX_LOOPED_EXIST, PtfxEffect)) 
+                                Function.Call(Hash.SET_PARTICLE_FX_LOOPED_EVOLUTION, PtfxEffect, "power", 1f, false);
 
                             if (Game.IsControlJustReleased(Control.Attack))
                             {
@@ -226,7 +230,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                                 PlayerScene.PlayEntity(Bag, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_p_m_bag_var22_arm_s");
                                 PlayerScene.PlayEntity(Drill, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_ch_prop_vault_drill_01a");
                                 PlayerScene.PlayCam($"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_cam");
-                                PlayerScene.SetLooped(true);
+                                PlayerScene.IsLooped = true;
                             }
                         }
                         else if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Game.Player.Character, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle", 3))
@@ -271,7 +275,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames
                             PlayerScene.PlayEntity(Bag, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_p_m_bag_var22_arm_s");
                             PlayerScene.PlayEntity(Drill, $"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_ch_prop_vault_drill_01a");
                             PlayerScene.PlayCam($"anim_heist@hs3f@ig10_lockbox_drill@pattern_0{Pattern}@lockbox_0{Stage}@male@", "idle_cam");
-                            PlayerScene.SetLooped(true);
+                            PlayerScene.IsLooped = true;
                         }
                     }
                     break;

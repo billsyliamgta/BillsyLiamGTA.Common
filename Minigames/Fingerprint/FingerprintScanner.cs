@@ -12,6 +12,7 @@ using GTA.UI;
 using GTA.Math;
 using GTA.Native;
 using BillsyLiamGTA.Common.SHVDN.Ped;
+using static BillsyLiamGTA.Common.SHVDN.Elements.Extensions;
 
 namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
 {
@@ -104,7 +105,6 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
             {
                 case FingerprintScannerType.Dummy:
                     {
-
                     }
                     break;
                 case FingerprintScannerType.Minigame:
@@ -115,8 +115,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                 {
                                     if (CanBeUsed)
                                     {
-                                        Function.Call(Hash.REQUEST_ANIM_DICT, "anim_heist@hs3f@ig1_hack_keypad@male@");
-                                        if (Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, "anim_heist@hs3f@ig1_hack_keypad@male@"))
+                                        RequestAnimDict("anim_heist@hs3f@ig1_hack_keypad@male@");
+                                        if (HasAnimDictLoaded("anim_heist@hs3f@ig1_hack_keypad@male@"))
                                         {
                                             Vector3 posOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_POSITION, "anim_heist@hs3f@ig1_hack_keypad@male@", "action_var_01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
                                             Vector3 rotOffset = Function.Call<Vector3>(Hash.GET_ANIM_INITIAL_OFFSET_ROTATION, "anim_heist@hs3f@ig1_hack_keypad@male@", "action_var_01", Keypad.Position.X, Keypad.Position.Y, Keypad.Position.Z, Keypad.Rotation.X, Keypad.Rotation.Y, Keypad.Rotation.Z, 0f, 2);
@@ -162,7 +162,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                         Scene.PlayPed(Game.Player.Character, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01", 8f, 8f, SynchronizedScene.PlaybackFlags.HIDE_WEAPON);
                                         Scene.PlayEntity(USB, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01_ch_prop_ch_usb_drive01x");
                                         Scene.PlayEntity(Phone, "anim_heist@hs3f@ig1_hack_keypad@male@", "hack_loop_var_01_prop_phone_ing");
-                                        Scene.SetLooped(true);
+                                        Scene.IsLooped = true;
                                         Index++;
                                     }
                                 }
@@ -170,9 +170,7 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                             case 3:
                                 {
                                     if (Minigame == null)
-                                    {
                                         Minigame = new FingerprintMinigame(PrintsToHack);
-                                    }
                                     else
                                     {
                                         Minigame.Update();
@@ -426,7 +424,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Minigames.Fingerprint
                                     }
                                     else
                                     {
-                                        if (shouldPlayExit) Function.Call(Hash.TASK_PLAY_ANIM, Game.Player.Character, "anim@heists@ornate_bank@thermal_charge", "cover_eyes_exit", 8f, 8f, -1, 48, 0f, false, false, false);
+                                        if (shouldPlayExit) 
+                                            Function.Call(Hash.TASK_PLAY_ANIM, Game.Player.Character, "anim@heists@ornate_bank@thermal_charge", "cover_eyes_exit", 8f, 8f, -1, 48, 0f, false, false, false);
                                     }
 
                                     if (Game.GameTime - ThermalBurnPtfxStartedGameTime > 15000)

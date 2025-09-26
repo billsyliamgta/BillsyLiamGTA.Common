@@ -122,9 +122,7 @@ namespace BillsyLiamGTA.Common.SHVDN
                 var bag = GetBagDrawableAndTexture(ped, type).First();
 
                 if (Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped, 5) == bag.Key && Function.Call<int>(Hash.GET_PED_TEXTURE_VARIATION, ped, 5) == bag.Value)
-                {
                     return type;
-                }
             }
 
             return BagVariantTypes.Invalid;

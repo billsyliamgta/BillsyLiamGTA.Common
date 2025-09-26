@@ -115,8 +115,8 @@ namespace BillsyLiamGTA.Common.SHVDN.Scaleform
 
         private void DrawAll()
         {
-            Background.DrawFullscreenMasked(Foreground);
-            Main.DrawFullscreen();
+            Background.Render2DMasked(Foreground);
+            Main.Render2D();
         }
 
         public void ShowResult(string missionText, string completeText, string messageText, int duration = 5, List<BigDollarsStep> bigDollarsSteps = null)
