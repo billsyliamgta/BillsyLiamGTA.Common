@@ -1,4 +1,4 @@
-﻿/*
+/*
 * BillsyLiamGTA.Common - A ScripthookV .NET framework for Grand Theft Auto V
 * Copyright (C) 2025 BillsyLiamGTA
 *
@@ -58,6 +58,7 @@ namespace BillsyLiamGTA.Common.SHVDN
                 ScriptPlayerPreviousModel = ped.Model;
             }
 
+            // TODO - Test this on GTAV Enhanced.
             ulong num = (ulong)(long)ped.MemoryAddress;
             ulong num2 = *(ulong*)(num + 32);
             *(long*)(num2 + 24) = 3214308084L;
@@ -67,6 +68,7 @@ namespace BillsyLiamGTA.Common.SHVDN
         {
             GTA.Ped ped = Game.Player.Character;
 
+            // TODO - Test this on GTAV Enhanced.
             if (ScriptIsFreemodeMale)
             {
                 ulong num = (ulong)(long)ped.MemoryAddress;
@@ -103,7 +105,6 @@ namespace BillsyLiamGTA.Common.SHVDN
             cutscenePed4Comp = null;
         }
 
-
         public static string[] GetCutscenePedCompArray(string mp)
         {
             string[] targetCompArray = null;
@@ -134,11 +135,15 @@ namespace BillsyLiamGTA.Common.SHVDN
             if (targetCompArray == null)
                 return;
 
-            for (int i = 0; i < 12; i++)
+            if (targetCompArray.Length == 12)
             {
-                int drawable = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
-                int texture = Function.Call<int>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
-                targetCompArray[i] = i + "_" + drawable + "_" + texture;
+                // If the array length equals 12, the drawables and textures will be set. This is to avoid a null exception.
+                for (int i = 0; i < 12; i++)
+                {
+                    int drawable = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                    int texture = Function.Call<int>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
+                    targetCompArray[i] = i + "_" + drawable + "_" + texture;
+                }
             }
         }
 
